@@ -102,7 +102,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.isNewChat){
 
     }
-    
+
     // Show the modal
     modal.style.display = 'block'; 
 
@@ -518,13 +518,13 @@ function createModal(request) {
 
     .modal-container.fade-in {
       display: block;
-      animation: fadeIn 0.3s forwards;
+      animation: fadeIn 0.3s;
       left: 50%;
       top: 50%
     }
     
     .modal-container.fade-out {
-      animation: fadeOut 0.3s forwards;
+      animation: fadeOut 0.3s;
     }
     
     .maximize-dialog-button {
