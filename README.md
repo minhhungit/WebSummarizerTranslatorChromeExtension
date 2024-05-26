@@ -38,20 +38,20 @@ Bạn có thể tùy chỉnh cài đặt của phần mở rộng bằng cách t
 Trên trang Tùy chọn, bạn có thể thiết lập:
 ![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
 
-- **URL API:** Điểm cuối API cho dịch vụ AI được chọn.
+- **API URL:** Điểm cuối API cho dịch vụ AI được chọn.
   - Đối với **OpenAI**, URL thường là: `https://api.openai.com/v1/chat/completions`.
-  - Groq: https://api.groq.com/openai/v1/chat/completions
+  - Groq: `https://api.groq.com/openai/v1/chat/completions`
 
-- **Khóa API:** Khóa API của bạn cho dịch vụ AI.
+- **API KEY:** Khóa API của bạn cho dịch vụ AI.
     - **Nhận khóa API của bạn từ OpenAI:** [https://platform.openai.com/settings/profile?tab=api-keys](https://platform.openai.com/settings/profile?tab=api-keys)
     - **Nhận khóa API của bạn từ Groq:** [https://console.groq.com/](https://console.groq.com/) (tham khảo tài liệu của họ để lấy khóa) 
-- **Tên Mô hình:** Mô hình AI cụ thể bạn muốn sử dụng. Đề xuất nên sử dụng `llama3-70b-8192` trên Groq bởi vì nó trả lời nhanh, mặc dù tiếng Việt hơi kém.
-- **Nhiệt độ:** Điều chỉnh sự sáng tạo và ngẫu nhiên của đầu ra của AI.
-- **Token Tối đa:** Giới hạn độ dài của phản hồi của AI.
-- **Khóa API của Open AI Whisper:** Khóa API của bạn cho dịch vụ chuyển văn bản thành âm thanh của OpenAI (cho tính năng Phát âm).
+- **Model Name:** Mô hình AI cụ thể bạn muốn sử dụng. Đề xuất nên sử dụng `llama3-70b-8192` trên Groq bởi vì nó trả lời nhanh, mặc dù tiếng Việt hơi kém.
+- **Temperature:** Điều chỉnh sự sáng tạo và ngẫu nhiên của đầu ra của AI.
+- **Max Token:** Giới hạn độ dài của phản hồi của AI.
+- **API Key của Open AI Whisper:** Khóa API của bạn cho dịch vụ chuyển văn bản thành âm thanh của OpenAI (cho tính năng Phát âm).
     - **Nhận khóa API của OpenAI Whisper của bạn:** [https://platform.openai.com/settings/profile?tab=api-keys](https://platform.openai.com/settings/profile?tab=api-keys) 
-- **Tên Mô hình của Open AI Whisper:** Mô hình Whisper cụ thể cho chuyển văn bản thành âm thanh.
-- **Giọng:** Giọng bạn muốn sử dụng cho việc phát âm.
+- **Open AI Whisper Model Name:** Mô hình Whisper cụ thể cho chuyển văn bản thành âm thanh.
+- **Voice Name:** Giọng bạn muốn sử dụng cho việc phát âm (echo, alloy...)
 - Xem thêm: [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
 
 ## Demo
