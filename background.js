@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //   sendResponse({ selectedText: selectedText });
   // }
 
-  if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english') {
+  if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english' || request.type === 'simple-chat') {
 
     /*
     request: {
@@ -36,6 +36,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let requestObj = {};
 
       switch(request.type){
+        case "simple-chat":
+          requestObj = {
+            messages: [],
+            model: modelName, // Replace with your actual model
+            temperature: temperature,
+            max_tokens: maxToken, //8192, 
+            top_p: 1,
+            stream: false,
+            stop: null
+          };
+          
+          requestObj.messages = request.messages;
+
+          break;
         case "summarize":
 
           requestObj = {
@@ -70,8 +84,7 @@ ${request.selectionText}`
           else{
             requestObj.messages = request.messages;
           }
-
-          requestBody = JSON.stringify(requestObj);
+          
           break;
 
           case "translate":
@@ -145,7 +158,6 @@ ${request.selectionText}`
               requestObj.messages = request.messages;
             }
 
-            requestBody = JSON.stringify(requestObj);
           break;
 
           case "correct-english":
@@ -203,12 +215,12 @@ ${request.selectionText}`
             requestObj.messages = request.messages;
           }
 
-          requestBody = JSON.stringify(requestObj);
-
           break;
       }
 
       //console.log(requestObj);
+
+      requestBody = JSON.stringify(requestObj);
 
       const requestOptions = {
         method: "POST",
@@ -282,6 +294,12 @@ chrome.contextMenus.removeAll();
 
 // Create context menu items
 chrome.contextMenus.create({
+  id: "simple-chat",
+  title: "Simple Chat",
+  contexts: ["page"]
+});
+
+chrome.contextMenus.create({
   id: "summarize",
   title: "✨ Summarize Selection",
   contexts: ["selection"]
@@ -307,7 +325,12 @@ chrome.contextMenus.create({
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'summarize' || info.menuItemId === 'translate' || info.menuItemId === 'correct-english' || info.menuItemId === 'pronounce') {
+  if (info.menuItemId === 'summarize' || 
+    info.menuItemId === 'translate' || 
+    info.menuItemId === 'correct-english' || 
+    info.menuItemId === 'pronounce' ||
+    info.menuItemId === 'simple-chat'
+  ) {
 
     // reset chat message
     chrome.storage.local.set({ 
