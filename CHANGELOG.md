@@ -1,7 +1,11 @@
 ## 1.2.1 (2024-05-27)
+### Features:
+- add css for error-message
+- should clear input text after added message to chat
 
 ### Fix bugs
 - fix blur annoying issue when hover on message or focus on input
+- fix issue: did not save user message into storage in case API get error
 
 ## 1.2 (2024-05-27)
 
