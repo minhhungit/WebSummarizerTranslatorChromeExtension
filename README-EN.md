@@ -2,6 +2,8 @@
 
 This Chrome Extension provides users with powerful AI-powered features to summarize, translate, correct English, and pronounce text directly from any webpage. 
 
+https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
+
 ## Features
 
 - **Summarize Text:** Quickly get a concise and comprehensive summary of any selected text. 
@@ -46,6 +48,12 @@ On the Options page, you can set:
 - **Open AI Whisper- Model Name:** The specific Whisper model for text-to-speech.
 - **Voice:** The voice you want to use for pronunciation.
 - **Check more**: [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
+
+## Demo
+![demo1](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/febbbd24-a87d-4a75-8046-a45a008980de)
+![menu](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/bfc2e665-69fe-45e5-bb23-b7a0c58bcb96)
+![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
+
 
 ## Contributing
 
