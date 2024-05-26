@@ -2,6 +2,8 @@
 
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
 
+https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
+
 ## Tính năng
 
 - **Tóm tắt Văn bản:** Nhanh chóng nhận được tóm tắt ngắn gọn và toàn diện của bất kỳ văn bản nào được chọn.
@@ -46,6 +48,11 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 - **Tên Mô hình của Open AI Whisper:** Mô hình Whisper cụ thể cho chuyển văn bản thành âm thanh.
 - **Giọng:** Giọng bạn muốn sử dụng cho việc phát âm.
 - Xem thêm: [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
+
+## Demo
+![demo1](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/febbbd24-a87d-4a75-8046-a45a008980de)
+![menu](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/bfc2e665-69fe-45e5-bb23-b7a0c58bcb96)
+![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
 
 ## Đóng góp
 
