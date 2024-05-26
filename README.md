@@ -1,6 +1,9 @@
 # Web Summarizer & Translator Chrome Extension
 
+[ENGLISH DOCS](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/blob/main/README-EN.md)
+
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
+
 
 https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
 
