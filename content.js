@@ -90,6 +90,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   // Listen for messages from the context menu
+  if (request.type === 'simple-chat') {
+    let modal = document.querySelector('.my-extension-modal');
+
+    // Create modal if it doesn't exist
+    if (!modal) {
+      modal = createModal(request);
+      document.body.appendChild(modal);
+    }
+
+    if (request.isNewChat){
+
+    }
+    
+    // Show the modal
+    modal.style.display = 'block'; 
+
+    const maximizeButton = modal.shadowRoot.querySelector('.maximize-dialog-button');
+    maximizeButton.click();
+
+    modal.shadowRoot.querySelector('.chat-input').focus();
+
+    // Keep the message channel open for the async response
+    sendResponse({status: 'OK'}); 
+  }
+
+  // Listen for messages from the context menu
   if (request.type === 'summarize' || request.type === 'translate' || request.type === 'correct-english') {
     //console.log('Message received in content.js:', request); 
     // Forward the message to background.js
@@ -111,7 +137,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       if (response.error) {
         console.error(response.error); 
-        addMessageIntoModal('assistant', response.error); 
+        addMessageIntoModal(request, 'assistant', response.error); 
         // Handle error, maybe show an error message on the page
       } else {
         // Display the result on the webpage 
@@ -136,7 +162,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // }
 
         // Method 4: show modal
-        addMessageIntoModal('assistant', response.result); 
+        addMessageIntoModal(request, 'assistant', response.result); 
       }
     });
 
@@ -228,12 +254,12 @@ function copyTextToClipboard(text) {
       });
 }
 
-function addMessageIntoModal(role, rawMessage) {
+function addMessageIntoModal(request, role, rawMessage) {
   let modal = document.querySelector('.my-extension-modal');
 
   // Create modal if it doesn't exist
   if (!modal) {
-    modal = createModal();
+    modal = createModal(request);
     document.body.appendChild(modal);
   }
 
@@ -301,21 +327,21 @@ function addMessageIntoModal(role, rawMessage) {
     let selectedMessageElm = findAncestor(e.target, 'chat-message');
     let selectedIndex = messagesArray.indexOf(selectedMessageElm);
 
-    let latestUserMessageIndex = selectedIndex;
+    let newestUserMessageIndex = selectedIndex;
     if (selectedMessageElm.classList.contains('assistant-message')){
       if (selectedIndex == 0)
       {
-        latestUserMessageIndex = latestUserMessageIndex - 1;
+        newestUserMessageIndex = newestUserMessageIndex - 1;
       }
       else{
-        latestUserMessageIndex = findNearestSiblingIndexWithClassUp(modal.shadowRoot.querySelector('.chat-messages').children, selectedIndex, 'user-message');
+        newestUserMessageIndex = findNearestSiblingIndexWithClassUp(modal.shadowRoot.querySelector('.chat-messages').children, selectedIndex, 'user-message');
       }      
     }
     
-    if (latestUserMessageIndex >= 0){
+    if (newestUserMessageIndex >= 0){
       if (messagesArray.length > 0){
         for(var i = modal.shadowRoot.querySelector('.chat-messages').children.length - 1; i >= 0 ; i--){
-          if (i >= (latestUserMessageIndex + 1)){
+          if (i >= (newestUserMessageIndex + 1)){
             modal.shadowRoot.querySelector('.chat-messages').children[i].remove();
           }
           else{
@@ -329,9 +355,18 @@ function addMessageIntoModal(role, rawMessage) {
       const memoryMessages = items.chatMessages;
       const lastSelectedCommand = items.lastSelectedCommand;
 
-      if (messagesArray.length > 0 && (latestUserMessageIndex + 2) >= 0){
-        memoryMessages.splice(latestUserMessageIndex + 2 + 1, memoryMessages.length - (latestUserMessageIndex + 2 + 1));
+      if (request.type === 'simple-chat'){
+        // simple chat has no predefined prompt
+        if (messagesArray.length > 0){
+          memoryMessages.splice(newestUserMessageIndex + 1, memoryMessages.length - (newestUserMessageIndex + 1));
+        }
       }
+      else{
+        // for features that already has pre-defined prompt 
+        if (messagesArray.length > 0 && (newestUserMessageIndex + 2) >= 0){
+          memoryMessages.splice(newestUserMessageIndex + 2 + 1, memoryMessages.length - (newestUserMessageIndex + 2 + 1));
+        }
+      }      
       
       showLoadingIndicator(); 
 
@@ -342,13 +377,13 @@ function addMessageIntoModal(role, rawMessage) {
         // Hide loading indicator when response is received
         hideLoadingIndicator(); 
 
-        if (latestUserMessageIndex < 0){
+        if (newestUserMessageIndex < 0){
           selectedMessageElm.remove();
         }
 
         if (response.error) {
           console.error(response.error); 
-          addMessageIntoModal('assistant', response.error); 
+          addMessageIntoModal(request, 'assistant', response.error); 
           // Handle error, maybe show an error message on the page
         } else {
           // remove last assistant response and replace new one
@@ -367,7 +402,7 @@ function addMessageIntoModal(role, rawMessage) {
           });
 
           // Display the result on the webpage        
-          addMessageIntoModal('assistant', response.result); 
+          addMessageIntoModal(request, 'assistant', response.result); 
         }
       });
     })
@@ -399,11 +434,14 @@ function addMessageIntoModal(role, rawMessage) {
   // Show the modal
   modal.style.display = 'block'; 
 
+  const maximizeButton = modal.shadowRoot.querySelector('.maximize-dialog-button');
+  maximizeButton.click();
+
   scrollToLastMessage();
   modal.shadowRoot.querySelector('.chat-input').focus();
 }
 
-function createModal() {
+function createModal(request) {
   const modal = document.createElement('div');
   modal.classList.add('my-extension-modal');
 
@@ -444,6 +482,24 @@ function createModal() {
       color: #3f3f3f;
     }
   
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;        
+      }
+    }
+    
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
     .modal-container {
       display: flex;
       flex-direction: column;
@@ -457,6 +513,44 @@ function createModal() {
       width: 65%;
       z-index: 2147483646;
       font-size: 16px;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-container.fade-in {
+      display: block;
+      animation: fadeIn 0.3s forwards;
+      left: 50%;
+      top: 50%
+    }
+    
+    .modal-container.fade-out {
+      animation: fadeOut 0.3s forwards;
+    }
+    
+    .maximize-dialog-button {
+      position: fixed;
+      bottom: 60px;
+      right: 100px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      width: 90px;
+      height: 90px;
+      box-shadow: 0 0 20px rgb(107 107 107);
+    }
+
+    .maximize-dialog-button.hide {
+      opacity: 0;
+    }
+
+    .maximize-dialog-button:hover {
+      background-color: #3e9bff;
     }
   
     .chat-messages {
@@ -574,11 +668,23 @@ function createModal() {
       cursor: pointer;
     }
   
-    .close-dialog-button, .print-chat-button {
+    .close-dialog-button, .print-chat-button, .minimize-dialog-button {
       border: none;
       border-radius: 5px;
       padding: 4px 6px;
       cursor: pointer;
+    }
+
+    .minimize-dialog-button {
+      background-color: #28a745;
+      color: white;
+      top: -12px;
+      position: fixed;
+      right: 105px;
+    }
+
+    .minimize-dialog-button:hover{
+      background-color: #10b736;
     }
 
     .print-chat-button{
@@ -631,6 +737,7 @@ function createModal() {
     <div class="modal-container">
       <div class="dialog-head">
         <h3 class="title">AI Chatbot</h3>
+        <button class="minimize-dialog-button" title="Minimize">Minimize</button>
         <button class="print-chat-button" title="Print">Print</button>
         <button class="close-dialog-button" title="Close">Close</button>
       </div>
@@ -640,11 +747,10 @@ function createModal() {
         <button class="send-button">Send</button>
       </div>
     </div>
+    <button class="maximize-dialog-button hide">AI Chatbot</button>
   `;
 
-  // 🔄
-
- // Function to load html2canvas script
+  // Function to load html2canvas script
 
   function loadHtml2Canvas() {
     return new Promise((resolve, reject) => {
@@ -662,8 +768,6 @@ function createModal() {
       shadow.appendChild(scriptElement);
     });
   }
-
-  
   
   shadow.querySelector('.close-dialog-button').addEventListener('click', () => {
     
@@ -685,6 +789,26 @@ function createModal() {
     
   });
 
+  const maximizeButton = shadow.querySelector('.maximize-dialog-button');
+  const minimizeButton = shadow.querySelector('.minimize-dialog-button');
+  const modalContainer = shadow.querySelector('.modal-container');
+
+  maximizeButton.addEventListener('click', () => {
+    modalContainer.classList.remove('fade-out');
+    modalContainer.classList.add('fade-in');
+    modalContainer.style.display = 'block';
+    maximizeButton.classList.add('hide');
+  });
+
+  minimizeButton.addEventListener('click', () => {
+    modalContainer.classList.remove('fade-in');
+    modalContainer.classList.add('fade-out');
+      setTimeout(() => {
+        modalContainer.style.display = 'none';
+      }, 300); // Match the duration of the transition
+      maximizeButton.classList.remove('hide');
+  });
+  
   shadow.querySelector('.print-chat-button').addEventListener('click', () => {
     printChat(shadow.querySelector('.chat-messages'));
 
@@ -698,15 +822,21 @@ function createModal() {
         return;
       }
 
-      const lastSelectedCommand = items.lastSelectedCommand;
-      const memoryMessages = items.chatMessages;
+      let lastSelectedCommand = items.lastSelectedCommand;
+      let memoryMessages = items.chatMessages;
 
       memoryMessages.push({
         role: "user",
         content: chatMsgText
       });
 
-      showLoadingIndicator(); 
+      addMessageIntoModal(request, 'user', chatMsgText);
+
+      showLoadingIndicator();
+
+      if (request.type === 'simple-chat'){
+        lastSelectedCommand = 'simple-chat';
+      }
 
       chrome.runtime.sendMessage({ 
         type: lastSelectedCommand, 
@@ -718,7 +848,7 @@ function createModal() {
 
         if (response.error) {
           console.error(response.error); 
-          addMessageIntoModal('assistant', response.error); 
+          addMessageIntoModal(request, 'assistant', response.error); 
           // Handle error, maybe show an error message on the page
         } else {
           memoryMessages.push({
@@ -737,13 +867,13 @@ function createModal() {
           // clear chat box
           shadow.querySelector('.chat-input').value = '';
 
-          addMessageIntoModal('user', chatMsgText); 
+          //addMessageIntoModal(request, 'user', chatMsgText); 
 
           // Display the result on the webpage 
-          addMessageIntoModal('assistant', response.result); 
+          addMessageIntoModal(request, 'assistant', response.result); 
         }
       });
-    });
+    });   
   });
 
   shadow.querySelector('.chat-input').addEventListener('keydown', (event) => {
