@@ -59,7 +59,7 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 
 ## Đóng góp
 
-Mọi đóng góp đều được hoan nghênh! Hãy tự do gửi các vấn đề, đề xuất cải tiến hoặc tạo yêu cầu kéo.
+Mọi đóng góp đều được hoan nghênh!
 
 ## Giấy phép
 
