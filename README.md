@@ -4,7 +4,6 @@
 
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
 
-
 https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
 
 ## Tính năng
@@ -13,6 +12,8 @@ https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279
 - **Dịch Văn bản:** Dịch văn bản được chọn một cách dễ dàng sang một ngôn ngữ khác.
 - **Sửa lỗi Tiếng Anh:** Xác định và sửa lỗi ngữ pháp trong văn bản tiếng Anh.
 - **Phát âm Văn bản:** Nghe phát âm của văn bản được chọn với tổng hợp giọng nói.
+
+![menu](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/bfc2e665-69fe-45e5-bb23-b7a0c58bcb96)
 
 ## Cài đặt
 
@@ -35,6 +36,7 @@ Bạn có thể tùy chỉnh cài đặt của phần mở rộng bằng cách t
 3. **Chọn "Tùy chọn":** Nhấp vào liên kết "Tùy chọn" trong hộp thoại mở rộng.
 
 Trên trang Tùy chọn, bạn có thể thiết lập:
+![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
 
 - **URL API:** Điểm cuối API cho dịch vụ AI được chọn.
   - Đối với **OpenAI**, URL thường là: `https://api.openai.com/v1/chat/completions`.
@@ -54,8 +56,6 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 
 ## Demo
 ![demo1](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/febbbd24-a87d-4a75-8046-a45a008980de)
-![menu](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/bfc2e665-69fe-45e5-bb23-b7a0c58bcb96)
-![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
 
 ## Đóng góp
 
