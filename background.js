@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const maxToken = items.maxToken || 4096;
 
       if (!apiUrl || !apiKey || !modelName) {
-        console.error("API URL or API Key or Model Name not configured.");
+        //console.error("API URL or API Key or Model Name not configured.");
         sendResponse({ error: "API not configured" });
         return;
       }

@@ -35,7 +35,7 @@ const fetchAudio = (openAITTSApiKey, openAITTSModelName, openAITTSVoice, text) =
           playAudio(audioUrl);
       })
       .catch(error => {
-          console.error('Error:', error);
+          alert('Error:', error);
       });
   }
 };
@@ -136,8 +136,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
 
       if (response.error) {
-        console.error(response.error); 
-        addMessageIntoModal(request, 'assistant', response.error); 
+        //console.error(response.error); 
+        addMessageIntoModal(request, 'assistant', response.error, true); 
         // Handle error, maybe show an error message on the page
       } else {
         // Display the result on the webpage 
@@ -162,7 +162,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // }
 
         // Method 4: show modal
-        addMessageIntoModal(request, 'assistant', response.result); 
+        addMessageIntoModal(request, 'assistant', response.result, false); 
       }
     });
 
@@ -226,7 +226,7 @@ function findAncestor (el, cls) {
 function findNearestSiblingIndexWithClassUp(array, index, className) {
   // Check if the provided index is within the valid range
   if (index < 0 || index >= array.length) {
-    console.error("Index out of range");
+    //console.error("Index out of range");
     return -1;
   }
 
@@ -254,7 +254,7 @@ function copyTextToClipboard(text) {
       });
 }
 
-function addMessageIntoModal(request, role, rawMessage) {
+function addMessageIntoModal(request, role, rawMessage, isError) {
   let modal = document.querySelector('.my-extension-modal');
 
   // Create modal if it doesn't exist
@@ -273,6 +273,10 @@ function addMessageIntoModal(request, role, rawMessage) {
   const newMessage = document.createElement('div');
   newMessage.classList.add("chat-message");
   newMessage.classList.add(`${role}-message`);
+
+  if (isError){
+    newMessage.classList.add(`error-message`);
+  }
 
   newMessage.innerHTML = htmlContent; 
 
@@ -382,8 +386,14 @@ function addMessageIntoModal(request, role, rawMessage) {
         }
 
         if (response.error) {
-          console.error(response.error); 
-          addMessageIntoModal(request, 'assistant', response.error); 
+          // update message list
+          chrome.storage.local.set({
+              chatMessages: memoryMessages
+            }, () => {
+          });
+
+          //console.error(response.error); 
+          addMessageIntoModal(request, 'assistant', response.error, true); 
           // Handle error, maybe show an error message on the page
         } else {
           // remove last assistant response and replace new one
@@ -402,7 +412,7 @@ function addMessageIntoModal(request, role, rawMessage) {
           });
 
           // Display the result on the webpage        
-          addMessageIntoModal(request, 'assistant', response.result); 
+          addMessageIntoModal(request, 'assistant', response.result, false); 
         }
       });
     })
@@ -600,6 +610,11 @@ function createModal(request) {
       float:left;
       width: 80%;
     }
+
+    .chat-message.error-message{
+      border: solid 1px #ffa9a9;
+      background: #ffeeee;
+    }
   
     .chat-message p {
       margin: 0;
@@ -607,7 +622,6 @@ function createModal(request) {
   
     .chat-message code {
       background-color: #fff;
-      padding: 2px 5px;
       border-radius: 3px;
       font-family: monospace;
       font-size: 14px;
@@ -830,7 +844,10 @@ function createModal(request) {
         content: chatMsgText
       });
 
-      addMessageIntoModal(request, 'user', chatMsgText);
+      addMessageIntoModal(request, 'user', chatMsgText, false);
+
+      // clear chat box
+      shadow.querySelector('.chat-input').value = '';
 
       showLoadingIndicator();
 
@@ -847,8 +864,14 @@ function createModal(request) {
         hideLoadingIndicator(); 
 
         if (response.error) {
-          console.error(response.error); 
-          addMessageIntoModal(request, 'assistant', response.error); 
+          // update message list
+          chrome.storage.local.set({
+              chatMessages: memoryMessages
+            }, () => {
+          });
+
+          //console.error(response.error); 
+          addMessageIntoModal(request, 'assistant', response.error, true); 
           // Handle error, maybe show an error message on the page
         } else {
           memoryMessages.push({
@@ -864,13 +887,10 @@ function createModal(request) {
 
           //console.log(memoryMessages);
 
-          // clear chat box
-          shadow.querySelector('.chat-input').value = '';
-
-          //addMessageIntoModal(request, 'user', chatMsgText); 
+          //addMessageIntoModal(request, 'user', chatMsgText, false); 
 
           // Display the result on the webpage 
-          addMessageIntoModal(request, 'assistant', response.result); 
+          addMessageIntoModal(request, 'assistant', response.result, false); 
         }
       });
     });   
