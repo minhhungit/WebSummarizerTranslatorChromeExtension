@@ -39,7 +39,7 @@ On the Options page, you can set:
 
 - **API Key:** Your API key for the AI service.
     - **Get your OpenAI API Key:** [https://platform.openai.com/settings/profile?tab=api-keys](https://platform.openai.com/settings/profile?tab=api-keys)
-    - **Get your Groq API Key:** [https://console.groq.com/](https://console.groq.com/) (refer to their documentation for key acquisition) 
+    - **Get your Groq API Key:** [https://console.groq.com/keys](https://console.groq.com/keys)
 - **Model Name:** The specific AI model you want to use.
 - **Temperature:** Adjust the creativity and randomness of the AI's output.
 - **Max Token:** Limit the length of the AI's response.
