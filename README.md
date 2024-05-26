@@ -44,7 +44,7 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 
 - **API KEY:** Khóa API của bạn cho dịch vụ AI.
     - **Nhận khóa API của bạn từ OpenAI:** [https://platform.openai.com/settings/profile?tab=api-keys](https://platform.openai.com/settings/profile?tab=api-keys)
-    - **Nhận khóa API của bạn từ Groq:** [https://console.groq.com/](https://console.groq.com/) (tham khảo tài liệu của họ để lấy khóa) 
+    - **Nhận khóa API của bạn từ Groq:** [https://console.groq.com/keys](https://console.groq.com/keys)
 - **Model Name:** Mô hình AI cụ thể bạn muốn sử dụng. Đề xuất nên sử dụng `llama3-70b-8192` trên Groq bởi vì nó trả lời nhanh, mặc dù tiếng Việt hơi kém.
 - **Temperature:** Điều chỉnh sự sáng tạo và ngẫu nhiên của đầu ra của AI.
 - **Max Token:** Giới hạn độ dài của phản hồi của AI.
