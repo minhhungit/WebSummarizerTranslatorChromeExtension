@@ -1,6 +1,6 @@
 # Web Summarizer & Translator Chrome Extension
 
-This Chrome Extension provides users with powerful AI-powered features to summarize, translate, correct English, and pronounce text directly from any webpage. 
+This Chrome Extension offers users powerful AI-driven features to summarize, translate, correct English, and pronounce text directly from any webpage.
 
 https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
 
