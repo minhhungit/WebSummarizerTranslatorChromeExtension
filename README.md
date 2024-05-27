@@ -24,7 +24,7 @@ https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279
 
 ## Cài đặt
 
-1. **Tải xuống phần mở rộng:** Tải xuống tệp `.zip` từ kho lưu trữ này.
+1. **Tải xuống phần mở rộng:** Tải xuống tệp `.zip` từ kho lưu trữ này. [Release](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/releases)
 2. **Mở Trình mở rộng Chrome:** Mở Chrome và gõ `chrome://extensions/` vào thanh địa chỉ.
 3. **Bật Chế độ Phát triển viên:** Bật chuyển đổi "Chế độ Phát triển viên".
 4. **Tải Gói không đóng gói:** Nhấp vào "Tải gói không đóng gói" và chọn thư mục mà bạn đã giải nén tệp `.zip`.
