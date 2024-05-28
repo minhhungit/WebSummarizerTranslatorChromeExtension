@@ -549,10 +549,10 @@ function createModal(request) {
       cursor: pointer;
       z-index: 1000;
       opacity: 1;
-      transition: opacity 0.3s ease;
       width: 90px;
       height: 90px;
       box-shadow: 0 0 20px rgb(107 107 107);
+      transition: transform .2s;
     }
 
     .maximize-dialog-button.hide {
@@ -561,6 +561,7 @@ function createModal(request) {
 
     .maximize-dialog-button:hover {
       background-color: #3e9bff;
+      transform: scale(1.1);
     }
   
     .chat-messages {
@@ -682,49 +683,6 @@ function createModal(request) {
       cursor: pointer;
     }
   
-    .close-dialog-button, .print-chat-button, .minimize-dialog-button {
-      border: none;
-      border-radius: 5px;
-      padding: 4px 6px;
-      cursor: pointer;
-    }
-
-    .minimize-dialog-button {
-      background-color: #28a745;
-      color: white;
-      top: -12px;
-      position: fixed;
-      right: 105px;
-    }
-
-    .minimize-dialog-button:hover{
-      background-color: #10b736;
-    }
-
-    .print-chat-button{
-      background-color: #28a745;
-      color: white;
-      top: -12px;
-      position: fixed;
-      right: 50px;
-    }
-
-    .print-chat-button:hover{
-      background-color: #10b736;
-    }
-
-    .close-dialog-button {
-      background-color: #eb4252;
-      color: white;
-      top: -12px;
-      position: fixed;
-      right: -12px;
-    }
-
-    .close-dialog-button:hover{
-      background-color: #ff0018;
-    }
-  
     .dialog-head {
       background-color: #007bff;
       padding: 10px;
@@ -740,20 +698,60 @@ function createModal(request) {
       margin: 0;
     }
   
-    .dialog-head button {
-      border: none;
+    .caption-bar-actions{
+      display: flex;
+      flex-direction: row;
+      position: fixed;
+      top: -10px;
+      right: -20px;
+    }
+
+    .caption-bar-action-button{
       color: white;
-      font-size: 16px;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
+      transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      margin-right: 10px;
+      height: 30px;
+      min-width: 30px;
+    }
+
+    .caption-bar-action-button:hover{
+      background-color: #58a8ff;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .caption-bar-action-button.close-dialog-button:hover{
+      background-color: #ff5858;
+    }
+
+    .minimize-dialog-button {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .print-chat-button{
+      background-color: #28a745;
+      color: white;
+    }
+
+    .close-dialog-button {
+      background-color: #eb4252;
+      color: white;
     }
     
     </style>
     <div class="modal-container">
       <div class="dialog-head">
         <h3 class="title">AI Chatbot</h3>
-        <button class="minimize-dialog-button" title="Minimize">Minimize</button>
-        <button class="print-chat-button" title="Print">Print</button>
-        <button class="close-dialog-button" title="Close">Close</button>
+        <div class="caption-bar-actions">
+          <button class="caption-bar-action-button print-chat-button" title="Print">🖶 Print</button>
+          <button class="caption-bar-action-button minimize-dialog-button" title="Minimize">⇘</button>
+          <button class="caption-bar-action-button close-dialog-button" title="Close">⤫</button>
+        </div>
       </div>
       <div class="chat-messages"></div>
       <div class="chat-input-container">
@@ -896,14 +894,17 @@ function createModal(request) {
     });   
   });
 
-  shadow.querySelector('.chat-input').addEventListener('keydown', (event) => {
+  shadow.querySelector('.chat-input').addEventListener('keydown', function (event) {
+    event.stopPropagation();
+
+    // Handle Enter key separately if needed
     if (event.key === 'Enter') {
-      // Prevent the default action to avoid a newline being added
-      event.preventDefault();
-      // Trigger the click event of the send button
-      shadow.querySelector('.send-button').click();
+        event.preventDefault(); // Prevent form submission or other default actions
+        
+        // Trigger the click event of the send button
+        shadow.querySelector('.send-button').click();
     }
-  });
+  }, true);
 
   // Make the modal draggable  
   makeModalDraggable(shadow.querySelector('.modal-container'), shadow.querySelector('.dialog-head'));
