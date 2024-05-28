@@ -1,3 +1,11 @@
+## 1.2.2 (2024-05-28)
+### Features:
+- add icon and more modern UI for caption action buttons
+- animation for maximize button
+- update prompt to reduce token
+### Fix bugs
+- fix a bug that trigger input textbox trigger keydown on main page
+
 ## 1.2.1 (2024-05-27)
 ### Features:
 - add css for error-message
