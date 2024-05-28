@@ -196,14 +196,7 @@ ${request.selectionText}`
 
 **Quy tắc ngữ pháp liên quan:**
 - Quy tắc ngữ pháp: Cung cấp quy tắc ngữ pháp liên quan đến lỗi để người học có thể nắm rõ hơn.
-- Ghi chú ngữ pháp: Giải thích chi tiết hơn về các quy tắc ngữ pháp phức tạp nếu cần.
-
-**Bài tập thực hành:**
-- Bài tập thực hành: Cung cấp các bài tập liên quan để người học có thể luyện tập và củng cố kiến thức về lỗi mà họ vừa sửa.
-
-**Ghi chú và mẹo học tập:**
-- Ghi chú học tập: Cung cấp các ghi chú ngắn gọn hoặc mẹo để giúp người học nhớ lâu hơn và tránh mắc lỗi tương tự trong tương lai.
-- Danh sách từ vựng: Nếu lỗi liên quan đến từ vựng, cung cấp danh sách từ vựng tương tự hoặc từ đồng nghĩa/đối nghĩa.`
+- Ghi chú ngữ pháp: Giải thích chi tiết hơn về các quy tắc ngữ pháp phức tạp nếu cần.`
             });
 
             requestObj.messages.push({
