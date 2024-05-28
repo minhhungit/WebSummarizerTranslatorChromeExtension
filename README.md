@@ -3,8 +3,12 @@
 [ENGLISH DOCS](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/blob/main/README-EN.md)
 
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
+> [!NOTE]
+> - Hiện tại Groq cung cấp API sử dụng model LLAMA 3 70B miễn phí, anh em đăng ký 1 account để lấy API mà dùng https://console.groq.com/keys
+> - Dùng OpenAI tốc độ trả lời rất chậm mà mất phí.
+> - Thông tin thêm là, tuy dùng LLAMA 3 70B trên Groq nhanh nhưng lại khó ép buộc model trả về tiếng Việt
+> - Groq rate limit: https://console.groq.com/docs/rate-limits
 
-> Hiện tại groq cung cấp model LLAMA 3 70B, anh em đăng ký 1 account để lấy API và dùng :)
 
 
 https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/6a29069d-7bc0-458e-a76c-c969b3c8ef53
@@ -20,7 +24,7 @@ https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279
 
 ## Cài đặt
 
-1. **Tải xuống phần mở rộng:** Tải xuống tệp `.zip` từ kho lưu trữ này.
+1. **Tải xuống phần mở rộng:** Tải xuống tệp `.zip` từ kho lưu trữ này. [Release](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/releases)
 2. **Mở Trình mở rộng Chrome:** Mở Chrome và gõ `chrome://extensions/` vào thanh địa chỉ.
 3. **Bật Chế độ Phát triển viên:** Bật chuyển đổi "Chế độ Phát triển viên".
 4. **Tải Gói không đóng gói:** Nhấp vào "Tải gói không đóng gói" và chọn thư mục mà bạn đã giải nén tệp `.zip`.
