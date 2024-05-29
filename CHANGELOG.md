@@ -1,3 +1,6 @@
+## 1.2.3 (2024-05-30)
+- fix issue on gpt: corrected english sentense always be returned as Vietnamese
+
 ## 1.2.2 (2024-05-28)
 ### Features:
 - add icon and more modern UI for caption action buttons
