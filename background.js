@@ -183,7 +183,8 @@ ${request.selectionText}`
               - Nếu không có yêu cầu đặc biệt, hãy trả lời bằng ngôn ngữ của câu hỏi mà bạn nhận được
               - Khi sửa lỗi, câu trả lời của bạn nên có 2 phần:
 ### Câu đúng
-- Từ hoặc câu văn sau khi đã sửa chính xác, markdown format, bôi đậm những chỗ đã sửa để highlight, phần giải thích nên được tổ chức tốt, dễ đọc, có outline...
+- Từ hoặc câu văn sau khi đã sửa chính xác (ngôn ngữ của câu đã sửa là ngôn ngữ của câu được yêu cầu sửa), ví dụ, bạn được yêu cầu sửa 1 câu tiếng Anh, thì bạn phải trả lời lại 1 câu tiếng Anh đã sửa hoàn chỉnh.
+- markdown format, bôi đậm những chỗ đã sửa để highlight, phần giải thích nên được tổ chức tốt, dễ đọc, có outline...
 - Nếu câu văn không có lỗi gì, thì chỉ cần nói là không có lỗi, đừng cố bịa ra câu trả lời.
 - Tách bạch của đã sửa với những thông tin phụ để tăng tính nhận diện, hỗ trợ cho người học dễ hiểu hơn, trực quan hơn
 
@@ -201,7 +202,7 @@ ${request.selectionText}`
 
             requestObj.messages.push({
               role: "user",
-              content: `Dưới đây là câu cần sửa, làm ơn trả lời tôi bằng tiếng Việt (please answer me in Vietnamese):\n
+              content: `Dưới đây là câu cần sửa (just correct English grammar, don't translate it):\n
 ${request.selectionText}`
             });
           }else{
