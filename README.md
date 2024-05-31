@@ -2,6 +2,8 @@
 
 [ENGLISH DOCS](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/blob/main/README-EN.md)
 
+[CHROME EXTENSION](https://chromewebstore.google.com/detail/web-summarizer-translator/efbnphdkhkehgbmgegjldhdknkbpljke)
+
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
 > [!NOTE]
 > - Hiện tại Groq cung cấp API sử dụng model LLAMA 3 70B miễn phí, anh em đăng ký 1 account để lấy API mà dùng https://console.groq.com/keys
