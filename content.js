@@ -455,12 +455,202 @@ function createModal(request) {
   const modal = document.createElement('div');
   modal.classList.add('my-extension-modal');
 
+  // To prevent the dialog from closing when clicking inside it, stop propagation of the click event
+  modal.addEventListener('click', function(event) {
+    event.stopPropagation();
+  });
+
   // Create a shadow root
   const shadow = modal.attachShadow({ mode: 'open' });
 
   // Add styles and content to the shadow root
   shadow.innerHTML = `
     <style>
+    html {
+      line-height: 1.15; /* 1 */
+      -webkit-text-size-adjust: 100%; /* 2 */
+    }
+
+    body {
+      margin: 0;
+    }
+
+    main {
+      display: block;
+    }
+
+
+    h1 {
+      font-size: 2em;
+      margin: 0.67em 0;
+    }
+
+
+    hr {
+      box-sizing: content-box; /* 1 */
+      height: 0; /* 1 */
+      overflow: visible; /* 2 */
+    }
+
+    pre {
+      font-family: monospace, monospace; /* 1 */
+      font-size: 1em; /* 2 */
+    }
+
+    a {
+      background-color: transparent;
+    }
+
+    abbr[title] {
+      border-bottom: none; /* 1 */
+      text-decoration: underline; /* 2 */
+      text-decoration: underline dotted; /* 2 */
+    }
+
+    b,
+    strong {
+      font-weight: bolder;
+    }
+
+    code,
+    kbd,
+    samp {
+      font-family: monospace, monospace; /* 1 */
+      font-size: 1em; /* 2 */
+    }
+
+    small {
+      font-size: 80%;
+    }
+
+    sub,
+    sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+
+    sub {
+      bottom: -0.25em;
+    }
+
+    sup {
+      top: -0.5em;
+    }
+
+    img {
+      border-style: none;
+    }
+
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      font-family: inherit; /* 1 */
+      font-size: 100%; /* 1 */
+      line-height: 1.15; /* 1 */
+      margin: 0; /* 2 */
+    }
+
+    button,
+    input { 
+      overflow: visible;
+    }
+
+    button,
+    select {
+      text-transform: none;
+    }
+
+
+    button,
+    [type="button"],
+    [type="reset"],
+    [type="submit"] {
+      -webkit-appearance: button;
+    }
+
+    button::-moz-focus-inner,
+    [type="button"]::-moz-focus-inner,
+    [type="reset"]::-moz-focus-inner,
+    [type="submit"]::-moz-focus-inner {
+      border-style: none;
+      padding: 0;
+    }
+
+    button:-moz-focusring,
+    [type="button"]:-moz-focusring,
+    [type="reset"]:-moz-focusring,
+    [type="submit"]:-moz-focusring {
+      outline: 1px dotted ButtonText;
+    }
+
+    fieldset {
+      padding: 0.35em 0.75em 0.625em;
+    }
+
+    legend {
+      box-sizing: border-box; /* 1 */
+      color: inherit; /* 2 */
+      display: table; /* 1 */
+      max-width: 100%; /* 1 */
+      padding: 0; /* 3 */
+      white-space: normal; /* 1 */
+    }
+
+    progress {
+      vertical-align: baseline;
+    }
+
+    textarea {
+      overflow: auto;
+    }
+
+    [type="checkbox"],
+    [type="radio"] {
+      box-sizing: border-box; /* 1 */
+      padding: 0; /* 2 */
+    }
+
+
+    [type="number"]::-webkit-inner-spin-button,
+    [type="number"]::-webkit-outer-spin-button {
+      height: auto;
+    }
+
+
+    [type="search"] {
+      -webkit-appearance: textfield; /* 1 */
+      outline-offset: -2px; /* 2 */
+    }
+
+    [type="search"]::-webkit-search-decoration {
+      -webkit-appearance: none;
+    }
+
+    ::-webkit-file-upload-button {
+      -webkit-appearance: button; /* 1 */
+      font: inherit; /* 2 */
+    }
+
+    details {
+      display: block;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    template {
+      display: none;
+    }
+
+    [hidden] {
+      display: none;
+    }
+
     body {
       font-family: 'Roboto', sans-serif;
       font-size: 15px;
@@ -523,7 +713,7 @@ function createModal(request) {
       width: 65%;
       z-index: 2147483646;
       font-size: 16px;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s;
     }
 
     .modal-container.fade-in {
@@ -595,14 +785,20 @@ function createModal(request) {
       width: 100%;
       margin-bottom: 10px;
       clear:both
+      font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    }
+
+    .chat-message ul, .chat-message li{
+      font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     }
   
     .chat-message.user-message {
       background-color: #f2f2f2;
-      text-align: right;
       float:right;
       width: auto;
       margin-right:20px;
+      max-width: 80%;
+      clear: both;
     }
   
     .chat-message.assistant-message {
@@ -610,15 +806,18 @@ function createModal(request) {
       text-align: left;
       float:left;
       width: 80%;
+      clear: both;
     }
 
     .chat-message.error-message{
       border: solid 1px #ffa9a9;
       background: #ffeeee;
+      clear: both;
     }
   
     .chat-message p {
       margin: 0;
+      font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     }
   
     .chat-message code {
@@ -710,12 +909,13 @@ function createModal(request) {
       color: white;
       background-color: #007BFF;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
-      transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
       margin-right: 10px;
       height: 30px;
       min-width: 30px;
+      line-height: 30px;
     }
 
     .caption-bar-action-button:hover{
@@ -976,6 +1176,7 @@ function makeModalDraggable(elmnt, headElmt) {
     document.onmousemove = null;
   }
 }
+
 // Function to show a loading indicator
 function showLoadingIndicator() {
   try{
@@ -1024,6 +1225,22 @@ function hideLoadingIndicator() {
     }
   }catch{}
 }
+
+// Event listener for clicks on the document
+document.addEventListener('click', function(event) {
+  let modal = document.querySelector('.my-extension-modal');
+
+  // Create modal if it doesn't exist
+  if (modal) {
+    // Check if the click happened outside the dialog
+    if (!modal.contains(event.target)) {
+      const minimizeButton = modal.shadowRoot.querySelector('.minimize-dialog-button');
+      if (minimizeButton){
+        minimizeButton.click();
+      }
+    }
+  }
+});
 
 // youtube
 
