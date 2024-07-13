@@ -628,9 +628,10 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
   actionCopyButton.textContent = "Copy";
   actionCopyButton.addEventListener('click', e=>{
     let selectedMessageElm = findAncestor(e.target, 'chat-message');
+    let bodyMessageElm = selectedMessageElm.querySelector('.message-body');
     //let selectedIndex = messagesArray.indexOf(selectedMessageElm);
 
-    copyTextToClipboard(selectedMessageElm.textContent);
+    copyTextToClipboard(bodyMessageElm.textContent);
   });
 
   msgActions.appendChild(actionEditButton);
