@@ -104,7 +104,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     // Show the modal
-    modal.style.display = 'block'; 
+    modal.style.display = 'flex'; 
 
     const maximizeButton = modal.shadowRoot.querySelector('.maximize-dialog-button');
     maximizeButton.click();
@@ -116,7 +116,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   // Listen for messages from the context menu
-  if (request.type === 'summarize' || request.type === 'translate' || request.type === 'correct-english') {
+  if (request.type === 'summarize' || request.type === 'translate' || request.type === 'correct-english' || request.type === 'teach-me') {
     //console.log('Message received in content.js:', request); 
     // Forward the message to background.js
 
@@ -135,35 +135,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         clearAllMessagesHtml();
       }
 
-      if (response.error) {
-        //console.error(response.error); 
-        addMessageIntoModal(request, 'assistant', response.error, true); 
-        // Handle error, maybe show an error message on the page
-      } else {
-        // Display the result on the webpage 
-        const resultText = response.result;
-        
-        //console.log(resultText);
+      chrome.storage.local.get(['defaultMessages'], (items) => {
+        const defaultMessages = items.defaultMessages;
 
-        // *** CHOOSE ONE OF THESE METHODS TO DISPLAY THE RESULT ***
-  
-        // Method 1: Alert (least desirable - use other methods if possible)
-        // alert(resultText);  
-  
-        // Method 2: Create a new element
-        // const resultDiv = document.createElement('div');
-        // resultDiv.textContent = resultText;
-        // document.body.appendChild(resultDiv); 
-  
-        // Method 3: Update an existing element (if you have a suitable one)
-        // const displayElement = document.querySelector('.my-display-element');
-        // if (displayElement) {
-        //   displayElement.textContent = resultText;
-        // }
+        if (response.error) {
+          //console.error(response.error); 
+          if (defaultMessages.length > 0){
+            defaultMessages.forEach((msg, idx)=>{
+              addMessageIntoModal(request, msg.role, msg.content, true, false);
+            })
+          }
 
-        // Method 4: show modal
-        addMessageIntoModal(request, 'assistant', response.result, false); 
-      }
+          addMessageIntoModal(request, 'assistant', response.error, false, true); 
+          // Handle error, maybe show an error message on the page
+        } else {
+          // Display the result on the webpage 
+          const resultText = response.result;
+          
+          //console.log(resultText);
+  
+          // *** CHOOSE ONE OF THESE METHODS TO DISPLAY THE RESULT ***
+    
+          // Method 1: Alert (least desirable - use other methods if possible)
+          // alert(resultText);  
+    
+          // Method 2: Create a new element
+          // const resultDiv = document.createElement('div');
+          // resultDiv.textContent = resultText;
+          // document.body.appendChild(resultDiv); 
+    
+          // Method 3: Update an existing element (if you have a suitable one)
+          // const displayElement = document.querySelector('.my-display-element');
+          // if (displayElement) {
+          //   displayElement.textContent = resultText;
+          // }
+  
+          // Method 4: show modal
+          if (defaultMessages.length > 0){
+            defaultMessages.forEach((msg, idx)=>{
+              addMessageIntoModal(request, msg.role, msg.content, true, false);
+            })
+          }
+          addMessageIntoModal(request, 'assistant', response.result, false, false); 
+        }
+      });
     });
 
     // Keep the message channel open for the async response
@@ -205,7 +220,16 @@ function printChat(elem)
   var mywindow = window.open('', 'PRINT', 'height=700,width=900');
 
   mywindow.document.write('<html><head><title></title>');
-  mywindow.document.write('</head><body >');
+  mywindow.document.write(`<style>
+    @media print
+    {    
+        .no-print, .no-print *
+        {
+            display: none !important;
+        }
+    }
+    </style>`);
+  mywindow.document.write('</head><body>');
   mywindow.document.write(elem.innerHTML);
   mywindow.document.write('</body></html>');
 
@@ -254,7 +278,17 @@ function copyTextToClipboard(text) {
       });
 }
 
-function addMessageIntoModal(request, role, rawMessage, isError) {
+function removeAllButMessageActions(selectedMessageElm) {
+  let children = selectedMessageElm.children;
+
+  for (let i = children.length - 1; i >= 0; i--) {
+      if (!children[i].classList.contains('message-actions')) {
+          selectedMessageElm.removeChild(children[i]);
+      }
+  }
+}
+
+function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isError) {
   let modal = document.querySelector('.my-extension-modal');
 
   // Create modal if it doesn't exist
@@ -268,20 +302,35 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
   // var converter = new showdown.Converter({extensions: ['table', 'youtube', 'prettify']});
   // const htmlContent = converter.makeHtml(rawMessage);
 
+  // Configure marked with the breaks option
+  marked.setOptions({
+      breaks: true // Enable GFM line breaks
+  });
+
   const htmlContent = marked.parse(rawMessage);
 
   const newMessage = document.createElement('div');
+
+  if (hideDefaultMessage){
+    newMessage.classList.add("default-message");
+    newMessage.classList.add("no-print");
+  }
   newMessage.classList.add("chat-message");
+  
   newMessage.classList.add(`${role}-message`);
 
   if (isError){
     newMessage.classList.add(`error-message`);
   }
 
-  newMessage.innerHTML = htmlContent; 
+  const msgBody = document.createElement('div');
+  msgBody.classList.add('message-body');
+  msgBody.innerHTML = htmlContent; 
+  newMessage.appendChild(msgBody);
 
   const msgActions = document.createElement('div');
   msgActions.classList.add('message-actions');
+  // msgActions.classList.add('no-print');
   
   // // Attach mousemove event listener
   // newMessage.addEventListener('mousemove', function(event) {
@@ -359,18 +408,22 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
       const memoryMessages = items.chatMessages;
       const lastSelectedCommand = items.lastSelectedCommand;
 
-      if (request.type === 'simple-chat'){
-        // simple chat has no predefined prompt
-        if (messagesArray.length > 0){
-          memoryMessages.splice(newestUserMessageIndex + 1, memoryMessages.length - (newestUserMessageIndex + 1));
-        }
+      if (messagesArray.length > 0){
+        memoryMessages.splice(newestUserMessageIndex + 1, memoryMessages.length - (newestUserMessageIndex + 1));
       }
-      else{
-        // for features that already has pre-defined prompt 
-        if (messagesArray.length > 0 && (newestUserMessageIndex + 2) >= 0){
-          memoryMessages.splice(newestUserMessageIndex + 2 + 1, memoryMessages.length - (newestUserMessageIndex + 2 + 1));
-        }
-      }      
+
+      // if (request.type === 'simple-chat'){
+      //   // simple chat has no predefined prompt
+      //   if (messagesArray.length > 0){
+      //     memoryMessages.splice(newestUserMessageIndex + 1, memoryMessages.length - (newestUserMessageIndex + 1));
+      //   }
+      // }
+      // else{
+      //   // for features that already has pre-defined prompt 
+      //   if (messagesArray.length > 0 && (newestUserMessageIndex + 2) >= 0){
+      //     memoryMessages.splice(newestUserMessageIndex + 2 + 1, memoryMessages.length - (newestUserMessageIndex + 2 + 1));
+      //   }
+      // }      
       
       showLoadingIndicator(); 
 
@@ -393,7 +446,7 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
           });
 
           //console.error(response.error); 
-          addMessageIntoModal(request, 'assistant', response.error, true); 
+          addMessageIntoModal(request, 'assistant', response.error, false, true); 
           // Handle error, maybe show an error message on the page
         } else {
           // remove last assistant response and replace new one
@@ -412,7 +465,7 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
           });
 
           // Display the result on the webpage        
-          addMessageIntoModal(request, 'assistant', response.result, false); 
+          addMessageIntoModal(request, 'assistant', response.result, false, false); 
         }
       });
     })
@@ -421,6 +474,154 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
   // const actionDeleteButton = document.createElement('button');
   // actionDeleteButton.classList.add("delete-button");
   // actionDeleteButton.textContent = "Delete";
+
+  const actionEditButton = document.createElement('button');
+  actionEditButton.classList.add("edit-button");
+  actionEditButton.textContent = "Edit";
+  actionEditButton.addEventListener('click', e=>{
+    const chatMessagesContainer = modal.shadowRoot.querySelector('.chat-messages');
+    const chatMessageElements = chatMessagesContainer.children;
+
+    let selectedMessageElm = findAncestor(e.target, 'chat-message');
+    let messageBodyElm = selectedMessageElm.querySelector('.message-body');
+    let selectedIndex = Array.from(chatMessageElements).indexOf(selectedMessageElm);
+
+    if (actionEditButton.innerText == "Edit"){
+      
+       // Create a new input textbox element
+      let inputTextbox = document.createElement('textarea');
+      inputTextbox.placeholder = "Type your message here...";
+      inputTextbox.rows = 4;
+      inputTextbox.style.width = '100%';
+      inputTextbox.style.minHeight = '100px';
+  
+      inputTextbox.value = rawMessage.replace(/<br\s*\/?>/ig, '\n');
+
+      messageBodyElm.innerHTML = "";
+
+      // Append the input textbox to the chat-message element
+      messageBodyElm.appendChild(inputTextbox);
+
+      inputTextbox.focus();
+
+      if (selectedMessageElm.classList.contains('assistant-message')){
+        role = "assistant";
+        actionEditButton.textContent = "Update";
+      }
+      else if (selectedMessageElm.classList.contains('user-message')){
+        role = "user";
+        actionEditButton.textContent = "Update";
+      }      
+    }
+    else{
+      marked.setOptions({
+          breaks: true // Enable GFM line breaks
+      });
+  
+      let textarea = messageBodyElm.querySelector('textarea');
+      const newMessage = textarea.value;
+      rawMessage = newMessage;
+      const htmlContent = marked.parse(newMessage);
+      
+      actionEditButton.textContent = "Edit";
+
+      //removeAllButMessageActions(selectedMessageElm);
+
+      messageBodyElm.innerHTML = htmlContent;
+
+      // Check if selectedIndex is within bounds
+      if (selectedIndex >= 0 && selectedIndex < chatMessageElements.length) {
+        // Remove all elements after selectedIndex
+        for (let i = chatMessageElements.length - 1; i > selectedIndex; i--) {
+            chatMessagesContainer.removeChild(chatMessageElements[i]);
+        }
+      } else {
+          console.error('Invalid index to remove');
+      }
+
+      // trigger send button
+      chrome.storage.local.get(['lastSelectedCommand', 'chatMessages'], (items) => {
+        let lastSelectedCommand = items.lastSelectedCommand;
+        let memoryMessages = items.chatMessages;
+
+        let role = "user";
+    
+        if (selectedMessageElm.classList.contains('assistant-message')){
+          role = "assistant";
+        }
+        else if (selectedMessageElm.classList.contains('user-message')){
+          role = "user";
+        }
+    
+        // Remove all elements after selectedIndex
+        for (let i = memoryMessages.length - 1; i >= selectedIndex; i--) {
+          memoryMessages.splice(i, 1);
+        }
+        
+        memoryMessages.push({
+          role: role,
+          content: newMessage
+        });
+    
+        // save new list messages into memory
+        chrome.storage.local.set({
+          chatMessages: memoryMessages
+          }, () => {
+        });
+
+        // if (role == "assistant"){
+
+        // }
+        // else {
+        //   showLoadingIndicator();
+      
+        //   if (request.type === 'simple-chat'){
+        //     lastSelectedCommand = 'simple-chat';
+        //   }
+
+        //   chrome.runtime.sendMessage({ 
+        //     type: lastSelectedCommand, 
+        //     messages: memoryMessages
+        //   }, (response) => {
+      
+        //     // Hide loading indicator when response is received
+        //     hideLoadingIndicator(); 
+      
+        //     if (response.error) {
+        //       // update message list
+        //       chrome.storage.local.set({
+        //           chatMessages: memoryMessages
+        //         }, () => {
+        //       });
+      
+        //       //console.error(response.error); 
+        //       addMessageIntoModal(request, 'assistant', response.error, false, true); 
+        //       // Handle error, maybe show an error message on the page
+        //     } else {
+        //       memoryMessages.push({
+        //         role: "assistant",
+        //         content: response.result
+        //       });
+      
+        //       // update message list
+        //       chrome.storage.local.set({
+        //           chatMessages: memoryMessages
+        //         }, () => {
+        //       });
+      
+        //       //console.log(memoryMessages);
+      
+        //       //addMessageIntoModal(request, 'user', nextMessage, false); 
+      
+        //       // Display the result on the webpage 
+        //       addMessageIntoModal(request, 'assistant', response.result, false, false); 
+        //     }
+        //   });
+        // }
+      });
+    }
+
+  });
 
   const actionCopyButton = document.createElement('button');
   actionCopyButton.classList.add("copy-button");
@@ -432,7 +633,7 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
     copyTextToClipboard(selectedMessageElm.textContent);
   });
 
-  // msgActions.appendChild(actionEditButton);
+  msgActions.appendChild(actionEditButton);
   msgActions.appendChild(actionRetryButton);
   // msgActions.appendChild(actionDeleteButton);
   msgActions.appendChild(actionCopyButton);
@@ -442,7 +643,7 @@ function addMessageIntoModal(request, role, rawMessage, isError) {
   modal.shadowRoot.querySelector('.chat-messages').appendChild(newMessage);
 
   // Show the modal
-  modal.style.display = 'block'; 
+  modal.style.display = 'flex'; 
 
   const maximizeButton = modal.shadowRoot.querySelector('.maximize-dialog-button');
   maximizeButton.click();
@@ -707,20 +908,18 @@ function createModal(request) {
       border-radius: 10px;
       box-shadow: 0 0 20px rgb(107 107 107);
       position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 65%;
+      left: 10%;
+      top: 10%;
+      width: 80%;
       z-index: 2147483646;
       font-size: 16px;
       transition: opacity 0.3s;
     }
 
     .modal-container.fade-in {
-      display: block;
       animation: fadeIn 0.3s;
-      left: 50%;
-      top: 50%
+      left: 10%;
+      top: 10%
     }
     
     .modal-container.fade-out {
@@ -784,12 +983,17 @@ function createModal(request) {
       word-break: break-word;
       width: 100%;
       margin-bottom: 10px;
-      clear:both
+      clear:both;
       font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      color: #333 !important;
+      font-size: 16px;
+      line-height: 28px;
     }
 
     .chat-message ul, .chat-message li{
       font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      font-size: 16px;
+      line-height: 28px;
     }
   
     .chat-message.user-message {
@@ -814,10 +1018,16 @@ function createModal(request) {
       background: #ffeeee;
       clear: both;
     }
+
+    .chat-message.default-message{
+      display: none;
+    }
   
     .chat-message p {
       margin: 0;
       font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      font-size: 16px;
+      line-height: 28px;
     }
   
     .chat-message code {
@@ -851,6 +1061,7 @@ function createModal(request) {
       cursor: pointer;
       font-size: 14px;
       padding: 5px;
+      color: #333 !important;
     }
 
     .message-actions button:hover{
@@ -871,6 +1082,8 @@ function createModal(request) {
       resize: vertical;
       height: 50px;
       font-size: 16px;
+      background: #fff !important;
+      color: #333 !important;
     }
   
     .send-button {
@@ -888,7 +1101,6 @@ function createModal(request) {
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       position: relative;
-      cursor: move;
     }
   
     .dialog-head .title {
@@ -900,7 +1112,7 @@ function createModal(request) {
     .caption-bar-actions{
       display: flex;
       flex-direction: row;
-      position: fixed;
+      position: absolute;
       top: -10px;
       right: -20px;
     }
@@ -942,7 +1154,13 @@ function createModal(request) {
       background-color: #eb4252;
       color: white;
     }
-    
+    @@media print
+    {    
+        .no-print, .no-print *
+        {
+            display: none !important;
+        }
+    }
     </style>
     <div class="modal-container">
       <div class="dialog-head">
@@ -955,7 +1173,7 @@ function createModal(request) {
       </div>
       <div class="chat-messages"></div>
       <div class="chat-input-container">
-        <textarea class="chat-input" placeholder="Type your message here..."></textarea>
+        <textarea class="chat-input" rows="4" placeholder="Type your message here..."></textarea>
         <button class="send-button">Send</button>
       </div>
     </div>
@@ -1005,14 +1223,20 @@ function createModal(request) {
   const minimizeButton = shadow.querySelector('.minimize-dialog-button');
   const modalContainer = shadow.querySelector('.modal-container');
 
-  maximizeButton.addEventListener('click', () => {
+  maximizeButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    
     modalContainer.classList.remove('fade-out');
     modalContainer.classList.add('fade-in');
-    modalContainer.style.display = 'block';
+    modalContainer.style.display = 'flex';
     maximizeButton.classList.add('hide');
   });
 
-  minimizeButton.addEventListener('click', () => {
+  makeDraggable(shadow.querySelector('.maximize-dialog-button'), shadow.querySelector('.maximize-dialog-button'));
+
+  minimizeButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
     modalContainer.classList.remove('fade-in');
     modalContainer.classList.add('fade-out');
       setTimeout(() => {
@@ -1029,85 +1253,92 @@ function createModal(request) {
 
   shadow.querySelector('.send-button').addEventListener('click', () => {
     chrome.storage.local.get(['lastSelectedCommand', 'chatMessages'], (items) => {
-      const chatMsgText = shadow.querySelector('.chat-input').value;
-      if (!chatMsgText){
-        return;
-      }
-
       let lastSelectedCommand = items.lastSelectedCommand;
       let memoryMessages = items.chatMessages;
-
-      memoryMessages.push({
-        role: "user",
-        content: chatMsgText
-      });
-
-      addMessageIntoModal(request, 'user', chatMsgText, false);
-
+  
+      const chatInput = shadow.querySelector('.chat-input');
+  
+      let nextMessage = "";
+      let role = "";
+  
+      nextMessage = chatInput.value.replace(/\n/g, '<br />');
+      role = "user";
+      if (!nextMessage){
+        // allow submit with empty message
+      }
+      else{
+        addMessageIntoModal(request, role, nextMessage, false, false);
+            
+        memoryMessages.push({
+          role: role,
+          content: nextMessage
+        });
+      }
+  
       // clear chat box
       shadow.querySelector('.chat-input').value = '';
-
+  
       showLoadingIndicator();
-
+  
       if (request.type === 'simple-chat'){
         lastSelectedCommand = 'simple-chat';
       }
-
+  
       chrome.runtime.sendMessage({ 
         type: lastSelectedCommand, 
         messages: memoryMessages
       }, (response) => {
-
+  
         // Hide loading indicator when response is received
         hideLoadingIndicator(); 
-
+  
         if (response.error) {
           // update message list
           chrome.storage.local.set({
               chatMessages: memoryMessages
             }, () => {
           });
-
+  
           //console.error(response.error); 
-          addMessageIntoModal(request, 'assistant', response.error, true); 
+          addMessageIntoModal(request, 'assistant', response.error, false, true); 
           // Handle error, maybe show an error message on the page
         } else {
           memoryMessages.push({
             role: "assistant",
             content: response.result
           });
-
+  
           // update message list
           chrome.storage.local.set({
               chatMessages: memoryMessages
             }, () => {
           });
-
+  
           //console.log(memoryMessages);
-
-          //addMessageIntoModal(request, 'user', chatMsgText, false); 
-
+  
+          //addMessageIntoModal(request, 'user', nextMessage, false); 
+  
           // Display the result on the webpage 
-          addMessageIntoModal(request, 'assistant', response.result, false); 
+          addMessageIntoModal(request, 'assistant', response.result, false, false); 
         }
       });
-    });   
+    });
   });
 
   shadow.querySelector('.chat-input').addEventListener('keydown', function (event) {
     event.stopPropagation();
 
     // Handle Enter key separately if needed
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault(); // Prevent form submission or other default actions
-        
+
         // Trigger the click event of the send button
         shadow.querySelector('.send-button').click();
     }
   }, true);
 
   // Make the modal draggable  
-  makeModalDraggable(shadow.querySelector('.modal-container'), shadow.querySelector('.dialog-head'));
+  makeDraggable(shadow.querySelector('.modal-container'), shadow.querySelector('.dialog-head'));
 
   return modal;
 }
@@ -1136,7 +1367,7 @@ function createModal(request) {
 //   });
 // }
 
-function makeModalDraggable(elmnt, headElmt) {
+function makeDraggable(elmnt, headElmt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   if (headElmt) {
     // if present, the header is where you move the DIV from:
