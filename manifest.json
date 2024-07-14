@@ -1,11 +1,12 @@
 {
     "manifest_version": 3,
     "name": "Web Summarizer & Translator",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "description": "Summarize and translate web pages and selected text.",
     "permissions": [
       "storage",
-      "contextMenus"
+      "contextMenus",
+      "activeTab"
     ],
     "background": {
       "service_worker": "background.js"

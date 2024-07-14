@@ -1,13 +1,82 @@
+function clearTabStorage(tabId){
+  let tabIdKey = `store_tab_${tabId}`;
+  var obj = {};
+  obj[tabIdKey] = [];
+  chrome.storage.local.set(obj);
+}
+
+
+function setTabItems(tabId, items, cb){
+  let tabIdKey = `store_tab_${tabId}`;
+
+  chrome.storage.local.get([tabIdKey]).then(result => {
+    const tabObject = result[tabIdKey] || {};
+    Object.keys(items).forEach(itemName => {
+      tabObject[itemName] = items[itemName];
+    });
+
+    let setObj = {};
+    setObj[tabIdKey] = tabObject;
+
+    chrome.storage.local.set(setObj).then(() =>{
+      cb && cb();
+    });      
+  });
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  //console.log('Request received in background.js:', request);
+  
+  if (request.type === 'getTabItems') {
+    let tabIdKey = `store_tab_${sender.tab.id}`;
 
-  // if (request.type === 'getSelectedText') {
-  //   const selectedText = window.getSelection().toString();
-  //   sendResponse({ selectedText: selectedText });
-  // }
+    chrome.storage.local.get([tabIdKey]).then(result => {
+      const items = {};
+      (request.itemNames || []).forEach(itemName => {
+        items[itemName] = result[tabIdKey] && result[tabIdKey][itemName];
+      });  
+      sendResponse(items);
+    })
 
-  if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english' || request.type === 'teach-me' || request.type === 'simple-chat') {
+    return true; 
+  } else if (request.type === 'setTabItems') {
 
+    let tabIdKey = `store_tab_${sender.tab.id}`;
+    chrome.storage.local.get(tabIdKey).then(result => {
+      const tabObject = result[tabIdKey] || {};
+      Object.keys(request.itemNames).forEach(itemName => {
+        tabObject[itemName] = request.itemNames[itemName];
+      });
+
+      let setObj = {};
+      setObj[tabIdKey] = tabObject;
+      chrome.storage.local.set(setObj).then(()=>{
+        sendResponse({ result: 'success' });
+      });      
+    });
+    
+    return true; 
+  } else if (request.type === 'removeTabItems') {
+
+    let tabIdKey = `store_tab_${sender.tab.id}`;
+    chrome.storage.local.get(tabIdKey).then(result => {
+      const tabObject = result[tabIdKey];
+      if (tabObject) {
+        request.itemNames.forEach(itemName => {
+          delete tabObject[itemName];
+        });
+
+        let setObj = {};
+        setObj[tabIdKey] = tabObject;
+        chrome.storage.local.set(setObj).then(()=>{
+          sendResponse({ result: 'success' });
+        });
+      }      
+    });
+    
+    return true; 
+  }
+  else if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english' || request.type === 'teach-me' || request.type === 'simple-chat') 
+  {
     /*
     request: {
       type: command type, e.g summarize, translate, correct-english
@@ -298,13 +367,25 @@ ${request.selectionText}`
               content: msg
             });
 
-            chrome.storage.local.set({ 
-                defaultMessages: defaultMessages,
-                lastSelectedCommand: request.type,
-                chatMessages: requestObj.messages
-              }, () => {
-                sendResponse({ result: msg });
+            setTabItems(sender.tab.id, {
+              defaultMessages: defaultMessages,
+              lastSelectedCommand: request.type,
+              chatMessages: requestObj.messages
+            }, ()=>{
+              sendResponse({ result: msg });
             });
+            // chrome.tabs.sendMessage(sender.tab.id, { 
+            //   type: 'setTabItems', 
+            //   itemNames: {
+            //     defaultMessages: defaultMessages,
+            //     lastSelectedCommand: request.type,
+            //     chatMessages: requestObj.messages
+            //   }
+            // }, res => {
+            //   sendResponse({ result: msg });
+            // });       
+            // return true; 
+
           } else {
             let msg = data.error.message;
             requestObj.messages.push({
@@ -312,14 +393,26 @@ ${request.selectionText}`
               content: msg
             });
 
-            chrome.storage.local.set({ 
-                defaultMessages: defaultMessages,
-                lastSelectedCommand: request.type,
-                chatMessages: requestObj.messages
-              }, () => {
-                sendResponse({ error: msg });
+            setTabItems(sender.tab.id, {
+              defaultMessages: defaultMessages,
+              lastSelectedCommand: request.type,
+              chatMessages: requestObj.messages
+            }, ()=>{
+              sendResponse({ error: msg });
             });
-            
+
+            // chrome.tabs.sendMessage(sender.tab.id, { 
+            //   type: 'setTabItems', 
+            //   itemNames: {
+            //     defaultMessages: defaultMessages,
+            //     lastSelectedCommand: request.type,
+            //     chatMessages: requestObj.messages
+            //   }
+            // }, res => {
+            //   sendResponse({ error: msg });
+            // });
+
+            return true; 
           }
         })
         .catch(error => {
@@ -332,13 +425,26 @@ ${request.selectionText}`
             content: msg
           });
 
-          chrome.storage.local.set({ 
-              defaultMessages: defaultMessages,
-              lastSelectedCommand: request.type,
-              chatMessages: requestObj.messages
-            }, () => {
-              sendResponse({ error: msg });
+          setTabItems(sender.tab.id,  {
+            defaultMessages: defaultMessages,
+            lastSelectedCommand: request.type,
+            chatMessages: requestObj.messages
+          }, ()=>{
+            sendResponse({ error: msg });
           });
+
+          // chrome.tabs.sendMessage(sender.tab.id, { 
+          //   type: 'setTabItems', 
+          //   itemNames: {
+          //     defaultMessages: defaultMessages,
+          //     lastSelectedCommand: request.type,
+          //     chatMessages: requestObj.messages
+          //   }
+          // }, res => {
+          //   sendResponse({ error: msg });
+          // });
+
+          return true; 
         });
 
         return true; 
@@ -399,10 +505,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     info.menuItemId === 'simple-chat'
   ) {
 
-    // reset chat message
-    chrome.storage.local.set({ 
-        chatMessages: []
-      }, () => {
+    //reset chat message
+    setTabItems(tab.id, {
+      chatMessages: []
+    }, ()=>{
+      
     });
 
     // Send the message to the content script 
@@ -419,6 +526,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       //   alert(response.result);
       // }
     });
+
+    // clearTabStorage(tab.id);
+
+    // chrome.tabs.sendMessage(tab.id, { 
+    //   type: 'setTabItems', 
+    //   itemNames: {chatMessages: []}
+    // }, res => {});
+
+    
   }
 
+});
+
+// Listen for tab updates
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  // Set a default value for the tab
+  //setTabItemValue(tabId, 'foo', 'bar');
+});
+
+// Listen for tab removals
+chrome.tabs.onRemoved.addListener(function(tabId) {
+  clearTabStorage(tabId);
 });
