@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //   sendResponse({ selectedText: selectedText });
   // }
 
-  if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english' || request.type === 'simple-chat') {
+  if (request.type === 'summarize' || request.type === 'translate'|| request.type === 'correct-english' || request.type === 'teach-me' || request.type === 'simple-chat') {
 
     /*
     request: {
@@ -65,6 +65,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           if (request.selectionText){
             requestObj.messages.push({
               role: "system",
+              content: `You are a helpful AI assistant`
+            });
+
+            requestObj.messages.push({
+              role: "user",
               content: `Bạn có thể vui lòng cung cấp một bản tóm tắt ngắn gọn và đầy đủ về văn bản đã cho không? 
               - Phần tóm tắt phải nắm bắt được những điểm chính, chi tiết chính của văn bản đồng thời truyền tải chính xác ý muốn của tác giả. 
               - Hãy đảm bảo rằng phần tóm tắt được tổ chức tốt và dễ đọc, có tiêu đề các điểm chính và tiêu đề phụ chi tiết bổ sung rõ ràng để hướng dẫn người đọc qua từng phần. 
@@ -77,7 +82,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             requestObj.messages.push({
               role: "user",
-              content: `Dưới đây là nội dung cần tóm tắt (luôn trả lời bằng tiếng Việt):\n
+              content: `Dưới đây là nội dung cần tóm tắt (You must always answer in Vietnamese (unless otherwise requested)):\n
 ${request.selectionText}`
             });
           }
@@ -99,11 +104,15 @@ ${request.selectionText}`
             };
 
             if (request.selectionText){
-
               requestObj.messages.push({
                 role: "system",
-                content: `Bạn là chương trình dịch ngôn ngữ hỗ trợ cho người Việt, dịch tất cả ngôn ngữ sang tiếng Việt. Nếu ngôn ngữ gốc cần dịch là tiếng Việt thì hãy dịch sang tiếng Anh.
-LƯU Ý:
+                content: `You are a helpful AI assistant`
+              });
+
+              requestObj.messages.push({
+                role: "user",
+                content: `Bạn sẽ được đưa 1 câu văn hoặc đoạn văn bên dưới, hãy dịch nội dung sang tiếng Việt, ngược lại, nếu nội dung được cho là tiếng Việt thì dịch sang tiếng Anh.
+YÊU CẦU KHI DỊCH:
 - Nếu là code hoặc chứa code thì giữ nguyên phần code - không dịch phần code.
 - Phát hiện chủ đề, chuyên ngành của nội dung cần dịch và dịch theo đúng chuyên ngành, ví dụ chuyên ngành công nghệ thông tin, lập trình, trí tuệ nhân tạo, AI, machine learning, LLM (ngôn ngữ lớn), thời trang, kiến trúc...
 - Những từ hoặc cụm từ thuộc chuyên ngành thì không cần dịch, vì nếu dịch có thể rất tối nghĩa (nên cố gắng giải thích ý nghĩa ngắn gọn trong ngoặc đơn), ví dụ "fine-tuning" (tinh chỉnh)
@@ -151,7 +160,12 @@ LƯU Ý:
 
               requestObj.messages.push({
                 role: "user",
-                content: `Dưới đây là nội dung cần dịch:\n
+                content: `You must always respond in Vietnamese (unless otherwise requested)`
+              });
+              
+              requestObj.messages.push({
+                role: "user",
+                content: `OK, dưới đây là nội dung cần dịch:\n
 ${request.selectionText}`
               });
             }else{
@@ -176,8 +190,12 @@ ${request.selectionText}`
 
             requestObj.messages.push({
               role: "system",
-              content: `Bạn là chuyên gia ngôn ngữ, có hiểu biết sâu sắc văn hóa bản địa, đặc biệt là tiếng Anh và tiếng Việt, bạn sẽ giúp sửa lỗi tiếng Anh.
-              - Tiếng mẹ đẻ của người học là tiếng Việt
+              content: `You are a helpful AI assistant`
+            });
+
+            requestObj.messages.push({
+              role: "user",
+              content: `Bạn sẽ đóng vai là một chuyên gia về ngôn ngữ, có hiểu biết sâu sắc văn hóa bản địa, đặc biệt là tiếng Anh và tiếng Việt, bạn sẽ giúp sửa lỗi tiếng Anh.
               - Câu trả lời phải là định dạng markdown
               - Đừng đưa ra những câu "introduce prompt words or opening remarks" trong câu trả lời. Hãy đi thẳng vào câu trả lời. Đừng lan man, dài dòng.
               - Nếu không có yêu cầu đặc biệt, hãy trả lời bằng ngôn ngữ của câu hỏi mà bạn nhận được
@@ -202,7 +220,49 @@ ${request.selectionText}`
 
             requestObj.messages.push({
               role: "user",
-              content: `Dưới đây là câu cần sửa (just correct English grammar, don't translate it):\n
+              content: `You must always answer in Vietnamese, unless otherwise is requested.`
+            });
+
+            requestObj.messages.push({
+              role: "user",
+              content: `OK, dưới đây là câu cần sửa (just correct English grammar, don't translate it):\n
+${request.selectionText}`
+            });
+          }else{
+            requestObj.messages = request.messages;
+          }
+
+          break;
+
+          case "teach-me":
+
+          requestObj = {
+            messages: [],
+            model: modelName, //"llama3-70b-8192", // Replace with your actual model
+            temperature: temperature,
+            max_tokens: maxToken, 
+            top_p: 1,
+            stream: false,
+            stop: null
+          };
+
+          if (request.selectionText){
+
+            requestObj.messages.push({
+              role: "system",
+              content: `You are a knowledgeable and engaging teacher. 
+              Your goal is to educate the user about various topics they might be interested in. 
+              Provide clear explanations, examples, and answer any questions the user may have. 
+              Make sure to break down complex concepts into simpler terms and relate them to real-world applications when possible. 
+              Be patient, encouraging, and responsive to the user's level of understanding. 
+              Adapt your teaching style based on the user's feedback and engagement. 
+              Always strive to make learning enjoyable and accessible.
+              IMPORTANT: You must always answer in Vietnamese, unless otherwise is requested.`
+            });
+
+            requestObj.messages.push({
+              role: "user",
+              content: `OK, please teach me this (always answer me in Vietnamese please):\n
 ${request.selectionText}`
             });
           }else{
@@ -211,6 +271,8 @@ ${request.selectionText}`
 
           break;
       }
+
+      let defaultMessages = JSON.parse(JSON.stringify(requestObj.messages));
 
       //console.log(requestObj);
 
@@ -237,6 +299,7 @@ ${request.selectionText}`
             });
 
             chrome.storage.local.set({ 
+                defaultMessages: defaultMessages,
                 lastSelectedCommand: request.type,
                 chatMessages: requestObj.messages
               }, () => {
@@ -250,6 +313,7 @@ ${request.selectionText}`
             });
 
             chrome.storage.local.set({ 
+                defaultMessages: defaultMessages,
                 lastSelectedCommand: request.type,
                 chatMessages: requestObj.messages
               }, () => {
@@ -269,6 +333,7 @@ ${request.selectionText}`
           });
 
           chrome.storage.local.set({ 
+              defaultMessages: defaultMessages,
               lastSelectedCommand: request.type,
               chatMessages: requestObj.messages
             }, () => {
@@ -312,6 +377,13 @@ chrome.contextMenus.create({
 });
 
 chrome.contextMenus.create({
+  id: "teach-me",
+  title: "🎓 Teach Me This",
+  contexts: ["selection"]
+});
+
+
+chrome.contextMenus.create({
   id: "pronounce",
   title: "🔉 Pronounce",
   contexts: ["selection"]
@@ -322,6 +394,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'summarize' || 
     info.menuItemId === 'translate' || 
     info.menuItemId === 'correct-english' || 
+    info.menuItemId === 'teach-me' ||
     info.menuItemId === 'pronounce' ||
     info.menuItemId === 'simple-chat'
   ) {
