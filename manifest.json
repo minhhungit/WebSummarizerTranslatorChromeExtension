@@ -5,7 +5,8 @@
     "description": "Summarize and translate web pages and selected text.",
     "permissions": [
       "storage",
-      "contextMenus"
+      "contextMenus",
+      "activeTab"
     ],
     "background": {
       "service_worker": "background.js"

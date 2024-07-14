@@ -48,7 +48,7 @@ const playAudio = (audioUrl) => {
   audioElement.play();
 };
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   // if (request.type === 'getSelectedText') {
   //   const selectedText = window.getSelection().toString();
@@ -90,7 +90,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   // Listen for messages from the context menu
-  if (request.type === 'simple-chat') {
+  if (request.type === 'simple-chat') {    
     let modal = document.querySelector('.my-extension-modal');
 
     // Create modal if it doesn't exist
@@ -135,8 +135,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         clearAllMessagesHtml();
       }
 
-      chrome.storage.local.get(['defaultMessages'], (items) => {
-        const defaultMessages = items.defaultMessages;
+      chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['defaultMessages'] }, storageResponse => {
+        //console.log(storageResponse.value); // outputs "bar"
+
+        const defaultMessages = storageResponse.defaultMessages;
 
         if (response.error) {
           //console.error(response.error); 
@@ -404,9 +406,9 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
       }
     }
 
-    chrome.storage.local.get(['lastSelectedCommand', 'chatMessages'], (items) => {
-      const memoryMessages = items.chatMessages;
-      const lastSelectedCommand = items.lastSelectedCommand;
+    chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['lastSelectedCommand', 'chatMessages'] }, (storageResponse) => {
+      const memoryMessages = storageResponse.chatMessages;
+      const lastSelectedCommand = storageResponse.lastSelectedCommand;
 
       if (messagesArray.length > 0){
         memoryMessages.splice(newestUserMessageIndex + 1, memoryMessages.length - (newestUserMessageIndex + 1));
@@ -440,10 +442,8 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
 
         if (response.error) {
           // update message list
-          chrome.storage.local.set({
-              chatMessages: memoryMessages
-            }, () => {
-          });
+
+          chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatMessages: memoryMessages} }, (res) => {});
 
           //console.error(response.error); 
           addMessageIntoModal(request, 'assistant', response.error, false, true); 
@@ -459,16 +459,12 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
           //console.log(memoryMessages);
 
           // update message list
-          chrome.storage.local.set({
-              chatMessages: memoryMessages
-            }, () => {
-          });
-
+          chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatMessages: memoryMessages} }, (res) => {});          
           // Display the result on the webpage        
           addMessageIntoModal(request, 'assistant', response.result, false, false); 
         }
       });
-    })
+    });    
   });
 
   // const actionDeleteButton = document.createElement('button');
@@ -540,9 +536,10 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
       }
 
       // trigger send button
-      chrome.storage.local.get(['lastSelectedCommand', 'chatMessages'], (items) => {
-        let lastSelectedCommand = items.lastSelectedCommand;
-        let memoryMessages = items.chatMessages;
+
+      chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['lastSelectedCommand', 'chatMessages'] }, (storageResponse) => {
+        let lastSelectedCommand = storageResponse.lastSelectedCommand;
+        let memoryMessages = storageResponse.chatMessages;
 
         let role = "user";
     
@@ -564,63 +561,9 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
         });
     
         // save new list messages into memory
-        chrome.storage.local.set({
-          chatMessages: memoryMessages
-          }, () => {
-        });
-
-        // if (role == "assistant"){
-
-        // }
-        // else {
-        //   showLoadingIndicator();
-      
-        //   if (request.type === 'simple-chat'){
-        //     lastSelectedCommand = 'simple-chat';
-        //   }
-
-        //   chrome.runtime.sendMessage({ 
-        //     type: lastSelectedCommand, 
-        //     messages: memoryMessages
-        //   }, (response) => {
-      
-        //     // Hide loading indicator when response is received
-        //     hideLoadingIndicator(); 
-      
-        //     if (response.error) {
-        //       // update message list
-        //       chrome.storage.local.set({
-        //           chatMessages: memoryMessages
-        //         }, () => {
-        //       });
-      
-        //       //console.error(response.error); 
-        //       addMessageIntoModal(request, 'assistant', response.error, false, true); 
-        //       // Handle error, maybe show an error message on the page
-        //     } else {
-        //       memoryMessages.push({
-        //         role: "assistant",
-        //         content: response.result
-        //       });
-      
-        //       // update message list
-        //       chrome.storage.local.set({
-        //           chatMessages: memoryMessages
-        //         }, () => {
-        //       });
-      
-        //       //console.log(memoryMessages);
-      
-        //       //addMessageIntoModal(request, 'user', nextMessage, false); 
-      
-        //       // Display the result on the webpage 
-        //       addMessageIntoModal(request, 'assistant', response.result, false, false); 
-        //     }
-        //   });
-        // }
+        chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatMessages: memoryMessages} }, (res) => {});
       });
     }
-
   });
 
   const actionCopyButton = document.createElement('button');
@@ -1221,12 +1164,7 @@ function createModal(request) {
     const container = modal.shadowRoot.querySelector('.chat-messages')
     container.innerHTML = '';
 
-    chrome.storage.local.set({ 
-      lastSelectedCommand: undefined,
-      chatMessages: []
-      }, () => {
-    });
-    
+    chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {lastSelectedCommand: undefined,chatMessages: []} }, (res) => {});    
   });
 
   const maximizeButton = shadow.querySelector('.maximize-dialog-button');
@@ -1262,9 +1200,9 @@ function createModal(request) {
   });
 
   shadow.querySelector('.send-button').addEventListener('click', () => {
-    chrome.storage.local.get(['lastSelectedCommand', 'chatMessages'], (items) => {
-      let lastSelectedCommand = items.lastSelectedCommand;
-      let memoryMessages = items.chatMessages;
+    chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['lastSelectedCommand', 'chatMessages'] }, (storageResponse) => {
+      let lastSelectedCommand = storageResponse.lastSelectedCommand;
+      let memoryMessages = storageResponse.chatMessages;
   
       const chatInput = shadow.querySelector('.chat-input');
   
@@ -1304,10 +1242,7 @@ function createModal(request) {
   
         if (response.error) {
           // update message list
-          chrome.storage.local.set({
-              chatMessages: memoryMessages
-            }, () => {
-          });
+          chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatMessages: memoryMessages} }, (res) => {});
   
           //console.error(response.error); 
           addMessageIntoModal(request, 'assistant', response.error, false, true); 
@@ -1319,11 +1254,8 @@ function createModal(request) {
           });
   
           // update message list
-          chrome.storage.local.set({
-              chatMessages: memoryMessages
-            }, () => {
-          });
-  
+          chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatMessages: memoryMessages} }, (res) => {});
+
           //console.log(memoryMessages);
   
           //addMessageIntoModal(request, 'user', nextMessage, false); 
