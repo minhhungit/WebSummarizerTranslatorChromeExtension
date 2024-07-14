@@ -983,6 +983,7 @@ function createModal(request) {
       position: relative;
       word-break: break-word;
       width: 100%;
+      min-width: 120px;
       margin-bottom: 10px;
       clear:both;
       font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
@@ -1072,7 +1073,7 @@ function createModal(request) {
     .chat-input-container {
       display: flex;
       gap: 10px;
-      padding: 20px;
+      padding: 20px 20px 10px 20px;
     }
   
     .chat-input {
@@ -1102,6 +1103,7 @@ function createModal(request) {
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       position: relative;
+      cursor: move;
     }
   
     .dialog-head .title {
@@ -1110,6 +1112,12 @@ function createModal(request) {
       margin: 0;
     }
   
+    .dialog-footer{
+      height: 10px;
+      background-color: #eee;
+      cursor: move;
+    }
+
     .caption-bar-actions{
       display: flex;
       flex-direction: row;
@@ -1177,6 +1185,7 @@ function createModal(request) {
         <textarea class="chat-input" rows="4" placeholder="Type your message here..."></textarea>
         <button class="send-button">Send</button>
       </div>
+      <div class="dialog-footer"></div>
     </div>
     <button class="maximize-dialog-button hide">AI Chatbot</button>
   `;
@@ -1340,7 +1349,7 @@ function createModal(request) {
 
   // Make the modal draggable  
   makeDraggable(shadow.querySelector('.modal-container'), shadow.querySelector('.dialog-head'));
-
+  makeDraggable(shadow.querySelector('.modal-container'), shadow.querySelector('.dialog-footer'))
   return modal;
 }
 
@@ -1458,7 +1467,7 @@ function hideLoadingIndicator() {
   }catch{}
 }
 
-// Event listener for clicks on the document
+//Event listener for clicks on the document
 document.addEventListener('click', function(event) {
   let modal = document.querySelector('.my-extension-modal');
 
@@ -1473,6 +1482,21 @@ document.addEventListener('click', function(event) {
     }
   }
 });
+
+// document.addEventListener('mousedown', (event) => {
+//   let modal = document.querySelector('.my-extension-modal');
+
+//   if (!modal.contains(event.target)) {
+//     const isSelectingText = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement;
+//     const isDragging = event.buttons === 1; // 1 is the left mouse button
+//     if (!isSelectingText && !isDragging) {
+//       const minimizeButton = modal.shadowRoot.querySelector('.minimize-dialog-button');
+//       if (minimizeButton) {
+//         minimizeButton.click();
+//       }
+//     }
+//   }
+// });
 
 // youtube
 
@@ -1703,5 +1727,21 @@ function displaySubtitles(subtitleLines) {
     });
   }
 }
+
+// document.addEventListener('keydown', (event) => {
+//   let modal = document.querySelector('.my-extension-modal');
+
+//   if (modal.hidden != false) {
+//       event.preventDefault();
+//   }
+// });
+
+// document.addEventListener('keypress', (event) => {
+//   let modal = document.querySelector('.my-extension-modal');
+
+//   if (modal.hidden != false) {
+//       event.preventDefault();
+//   }
+// });
 
 // addSubtitleOverlay();
