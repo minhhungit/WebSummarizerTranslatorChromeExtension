@@ -4,6 +4,8 @@
 
 [CHROME EXTENSION](https://chromewebstore.google.com/detail/web-summarizer-translator/efbnphdkhkehgbmgegjldhdknkbpljke)
 
+![image](https://github.com/user-attachments/assets/502bc5f4-b17c-43d6-adee-1c6cf6af353f)
+
 Phần mở rộng Chrome này cung cấp cho người dùng các tính năng mạnh mẽ được cung cấp bởi trí tuệ nhân tạo để tóm tắt, dịch, sửa lỗi tiếng Anh và phát âm văn bản trực tiếp từ bất kỳ trang web nào.
 > [!NOTE]
 > - Hiện tại Groq cung cấp API sử dụng model LLAMA 3 70B miễn phí, anh em đăng ký 1 account để lấy API mà dùng https://console.groq.com/keys
@@ -22,7 +24,7 @@ https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279
 - **Sửa lỗi Tiếng Anh:** Xác định và sửa lỗi ngữ pháp trong văn bản tiếng Anh.
 - **Phát âm Văn bản:** Nghe phát âm của văn bản được chọn với tổng hợp giọng nói.
 
-![menu](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/bfc2e665-69fe-45e5-bb23-b7a0c58bcb96)
+![image](https://github.com/user-attachments/assets/587139ee-4feb-4f0d-b47a-96d504151587)
 
 ## Cài đặt
 
@@ -63,8 +65,8 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 - **Voice Name:** Giọng bạn muốn sử dụng cho việc phát âm (echo, alloy...)
 - Xem thêm: [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
 
-## Demo
-![demo1](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/febbbd24-a87d-4a75-8046-a45a008980de)
+## Sample Setting
+![image](https://github.com/user-attachments/assets/f631896f-1955-4fba-9719-eafb755d07af)
 
 ## Đóng góp
 
