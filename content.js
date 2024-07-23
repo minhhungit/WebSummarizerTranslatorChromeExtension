@@ -229,12 +229,313 @@ function printChat(elem)
   mywindow.document.write('<html><head><title></title>');
   mywindow.document.write(`<style>
     @media print
-    {    
-        .no-print, .no-print *
+    {
+      .no-print, .no-print *
         {
             display: none !important;
         }
-    }
+
+        .only-print, .only-print *
+        {
+            display: block !important;
+        }
+
+        html {
+        line-height: 1.15; /* 1 */
+        -webkit-text-size-adjust: 100%; /* 2 */
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        display: block;
+      }
+
+
+      h1 {
+        font-size: 2em;
+        margin: 0.67em 0;
+      }
+
+
+      hr {
+        box-sizing: content-box; /* 1 */
+        height: 0; /* 1 */
+        overflow: visible; /* 2 */
+      }
+
+      pre {
+        font-family: monospace, monospace; /* 1 */
+        font-size: 1em; /* 2 */
+      }
+
+      a {
+        background-color: transparent;
+      }
+
+      abbr[title] {
+        border-bottom: none; /* 1 */
+        text-decoration: underline; /* 2 */
+        text-decoration: underline dotted; /* 2 */
+      }
+
+      b,
+      strong {
+        font-weight: bolder;
+      }
+
+      code,
+      kbd,
+      samp {
+        font-family: monospace, monospace; /* 1 */
+        font-size: 1em; /* 2 */
+      }
+
+      small {
+        font-size: 80%;
+      }
+
+      sub,
+      sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+      }
+
+      sub {
+        bottom: -0.25em;
+      }
+
+      sup {
+        top: -0.5em;
+      }
+
+      img {
+        border-style: none;
+      }
+
+      button,
+      input,
+      optgroup,
+      select,
+      textarea {
+        font-family: inherit; /* 1 */
+        font-size: 100%; /* 1 */
+        line-height: 1.15; /* 1 */
+        margin: 0; /* 2 */
+      }
+
+      button,
+      input { 
+        overflow: visible;
+      }
+
+      button,
+      select {
+        text-transform: none;
+      }
+
+
+      button,
+      [type="button"],
+      [type="reset"],
+      [type="submit"] {
+        -webkit-appearance: button;
+      }
+
+      button::-moz-focus-inner,
+      [type="button"]::-moz-focus-inner,
+      [type="reset"]::-moz-focus-inner,
+      [type="submit"]::-moz-focus-inner {
+        border-style: none;
+        padding: 0;
+      }
+
+      button:-moz-focusring,
+      [type="button"]:-moz-focusring,
+      [type="reset"]:-moz-focusring,
+      [type="submit"]:-moz-focusring {
+        outline: 1px dotted ButtonText;
+      }
+
+      fieldset {
+        padding: 0.35em 0.75em 0.625em;
+      }
+
+      legend {
+        box-sizing: border-box; /* 1 */
+        color: inherit; /* 2 */
+        display: table; /* 1 */
+        max-width: 100%; /* 1 */
+        padding: 0; /* 3 */
+        white-space: normal; /* 1 */
+      }
+
+      progress {
+        vertical-align: baseline;
+      }
+
+      textarea {
+        overflow: auto;
+      }
+
+      [type="checkbox"],
+      [type="radio"] {
+        box-sizing: border-box; /* 1 */
+        padding: 0; /* 2 */
+      }
+
+
+      [type="number"]::-webkit-inner-spin-button,
+      [type="number"]::-webkit-outer-spin-button {
+        height: auto;
+      }
+
+
+      [type="search"] {
+        -webkit-appearance: textfield; /* 1 */
+        outline-offset: -2px; /* 2 */
+      }
+
+      [type="search"]::-webkit-search-decoration {
+        -webkit-appearance: none;
+      }
+
+      ::-webkit-file-upload-button {
+        -webkit-appearance: button; /* 1 */
+        font: inherit; /* 2 */
+      }
+
+      details {
+        display: block;
+      }
+
+      summary {
+        display: list-item;
+      }
+
+      template {
+        display: none;
+      }
+
+      [hidden] {
+        display: none;
+      }
+
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-size: 15px;
+      }
+
+      table {
+        border-collapse: collapse;
+        padding: 4px;
+        width: 100%;
+        table-layout: fixed;
+      }
+      table td, table th {
+        border: 1px solid orange;
+        padding: 4px;
+      }
+      
+      table td p, table th p {
+        padding: 0;
+        margin: 0;
+      }
+      
+      pre{
+        padding: 10px;
+      }
+      
+      pre, code{
+        background: #fff;
+        overflow-x: visible;
+        color: #3f3f3f;
+      }
+      
+      .chat-messages {
+        overflow-y: visible;
+        min-height: 500px;
+        margin: 20px;
+        max-height: 60vh;
+        padding-bottom: 50px;
+      }
+    
+      .chat-message {
+        padding: 10px;
+        border-radius: 8px;
+        position: relative;
+        word-break: break-word;
+        width: 100%;
+        min-width: 120px;
+        margin-bottom: 10px;
+        clear:both;
+        font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        color: #333 !important;
+        font-size: 16px;
+        line-height: 28px;
+      }
+
+      .chat-message ul, .chat-message li{
+        font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        font-size: 16px;
+        line-height: 28px;
+      }
+    
+      .chat-message.user-message {
+        background-color: #f2f2f2;
+        float:right;
+        width: auto;
+        margin-right:20px;
+        max-width: 80%;
+        clear: both;
+        border-right: solid 4px #ccc;
+      }
+    
+      .chat-message.assistant-message {
+        background-color: #e0f2f1;
+        text-align: left;
+        float:left;
+        width: 80%;
+        clear: both;
+        border-left: solid 4px #ccc;
+      }
+
+      .chat-message.error-message{
+        border: solid 1px #ffa9a9;
+        background: #ffeeee;
+        clear: both;
+
+        border: dashed 42px #ccc;
+      }
+
+      .chat-message.default-message{
+        display: none;
+      }
+    
+      .chat-message p {
+        margin: 0;
+        font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        font-size: 16px;
+        line-height: 28px;
+      }
+    
+      .chat-message code {
+        background-color: #fff;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+    
+      .chat-message .message-author{
+        font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        font-weight: bold;
+        color: #5da0be;
+      }
+    
     </style>`);
   mywindow.document.write('</head><body>');
   mywindow.document.write(elem.innerHTML);
@@ -335,6 +636,25 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
     newMessage.classList.add(`error-message`);
   }
 
+  const msgAuthor = document.createElement('div');
+  msgAuthor.classList.add('message-author');
+  msgAuthor.classList.add("only-print");
+  let author = "";
+  switch (role){
+    case "user":
+      author = "User:"
+      break;
+    case "assistant":
+      author = "AI:"
+      break;
+    case "system":
+      author = "System:"
+      break;  
+  }
+    
+  msgAuthor.innerHTML = author; 
+  newMessage.appendChild(msgAuthor);
+
   const msgBody = document.createElement('div');
   msgBody.classList.add('message-body');
   msgBody.innerHTML = htmlContent; 
@@ -342,7 +662,7 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
 
   const msgActions = document.createElement('div');
   msgActions.classList.add('message-actions');
-  // msgActions.classList.add('no-print');
+  msgActions.classList.add('no-print');
   
   // // Attach mousemove event listener
   // newMessage.addEventListener('mousemove', function(event) {
@@ -938,7 +1258,7 @@ function createModal(request) {
     }
   
     .chat-message {
-      padding: 20px;
+      padding: 10px;
       border-radius: 8px;
       position: relative;
       word-break: break-word;
@@ -1003,6 +1323,12 @@ function createModal(request) {
       width: 70% !important;
     }
   
+    .chat-message .message-author{
+      font: 1.0625rem/1.5 Segoe UI,"Segoe UI Web Regular","Segoe UI Regular WestEuropean","Segoe UI",Tahoma,Arial,Roboto,"Helvetica Neue",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+      font-weight: bold;
+      color: #5da0be;
+    }
+
     .message-actions {
       position: absolute;
       
@@ -1132,12 +1458,9 @@ function createModal(request) {
       background-color: #eb4252;
       color: white;
     }
-    @@media print
-    {    
-        .no-print, .no-print *
-        {
-            display: none !important;
-        }
+
+    .only-print, .only-print *{
+      display: none !important;
     }
     </style>
     <div class="modal-container">
