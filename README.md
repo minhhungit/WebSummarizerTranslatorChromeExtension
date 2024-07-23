@@ -51,7 +51,7 @@ Bạn có thể tùy chỉnh cài đặt của phần mở rộng bằng cách t
 3. **Chọn "Tùy chọn":** Nhấp vào liên kết "Tùy chọn" trong hộp thoại mở rộng.
 
 Trên trang Tùy chọn, bạn có thể thiết lập:
-![settings](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279508/cab02f16-922d-4193-9109-166a55685304)
+![image](https://github.com/user-attachments/assets/f631896f-1955-4fba-9719-eafb755d07af)
 
 - **API URL:** Điểm cuối API cho dịch vụ AI được chọn.
   - Đối với **OpenAI**, URL thường là: `https://api.openai.com/v1/chat/completions`.
@@ -68,9 +68,6 @@ Trên trang Tùy chọn, bạn có thể thiết lập:
 - **Open AI Whisper Model Name:** Mô hình Whisper cụ thể cho chuyển văn bản thành âm thanh.
 - **Voice Name:** Giọng bạn muốn sử dụng cho việc phát âm (echo, alloy...)
 - Xem thêm: [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
-
-## Sample Setting
-![image](https://github.com/user-attachments/assets/f631896f-1955-4fba-9719-eafb755d07af)
 
 ## Đóng góp
 
