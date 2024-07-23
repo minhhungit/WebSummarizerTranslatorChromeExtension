@@ -28,6 +28,10 @@ https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/assets/2279
 
 ## Cài đặt
 
+Bạn có thể cài đặt extension trực tiếp trên Chrome Store tại đây https://chromewebstore.google.com/detail/web-summarizer-translator/efbnphdkhkehgbmgegjldhdknkbpljke
+
+**Hoặc**
+
 1. **Tải xuống phần mở rộng:** Tải xuống tệp `.zip` từ kho lưu trữ này. [Release](https://github.com/minhhungit/WebSummarizerTranslatorChromeExtension/releases)
 2. **Mở Trình mở rộng Chrome:** Mở Chrome và gõ `chrome://extensions/` vào thanh địa chỉ.
 3. **Bật Chế độ Phát triển viên:** Bật chuyển đổi "Chế độ Phát triển viên".
