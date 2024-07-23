@@ -5,7 +5,6 @@ function clearTabStorage(tabId){
   chrome.storage.local.set(obj);
 }
 
-
 function setTabItems(tabId, items, cb){
   let tabIdKey = `store_tab_${tabId}`;
 
@@ -84,12 +83,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       messages: list all current messages of all roles, include system, user, assistant 
     }
     */
-    chrome.storage.sync.get(['apiUrl', 'apiKey', 'modelName', 'temperature', 'maxToken'], (items) => {
-      const apiUrl = items.apiUrl;
-      const apiKey = items.apiKey;
-      const modelName = items.modelName;
-      const temperature = items.temperature || 0;
-      const maxToken = items.maxToken || 4096;
+    chrome.storage.sync.get([
+      'completionProvider',
+      'groqApiUrl', 'groqApiKey', 'groqModelName', 'groqTemperature', 'groqMaxToken', 
+      'openAiApiUrl', 'openAiApiKey', 'openAiModelName', 'openAiTemperature', 'openAiMaxToken'
+    ], (items) => {
+      const completionProvider = items.completionProvider || 'groq';
+      
+      const apiUrl = completionProvider == "groq" ? items.groqApiUrl : items.openAiApiUrl;
+      const apiKey = completionProvider == "groq" ? items.groqApiKey :items.openAiApiKey;
+      const modelName = completionProvider == "groq" ? items.groqModelName : items.openAiModelName;
+      const temperature = completionProvider == "groq" ? (items.groqTemperature || 0) : (items.openAiTemperature || 0);
+      const maxToken = completionProvider == "groq" ? (items.groqMaxToken || 8192) : (items.openAiMaxToken || 4096);
 
       if (!apiUrl || !apiKey || !modelName) {
         //console.error("API URL or API Key or Model Name not configured.");
@@ -190,8 +195,10 @@ YÊU CẦU KHI DỊCH:
 - Nếu không có yêu cầu đặc biệt, hãy trả lời bằng ngôn ngữ của câu hỏi mà bạn nhận được
 - Câu trả lời phải là định dạng Markdown
 - Chỉ trả lời kết quả, đừng thêm những câu ở đầu như: 'Here is the translation:', 'Here is the translated content:'...."
+`
+
+/*
 - Chỉ dịch và không tự ý thêm thông tin gì, nhưng nên có 1 bảng tóm tắt giải thích các từ vựng, loại từ, phiên âm IPA UK/US ở dưới cùng cùng với tên chuyên ngành. 
-- Nếu được yêu cầu dịch từ hoặc văn bản, câu trả lời của bạn nên có 2 phần:
 
 ### Kết quả dịch
 - Hiển thị cả bản gốc và bản dịch (nếu câu cần dịch quá dài thì chỉ hiển thị bản dịch)
@@ -224,7 +231,8 @@ YÊU CẦU KHI DỊCH:
 **Ghi chú văn hóa và sử dụng đặc biệt:**
 - Ghi chú văn hóa: Giải thích các khác biệt văn hóa hoặc các cách sử dụng đặc biệt của từ trong các ngữ cảnh khác nhau.
 - Phong cách sử dụng: Chỉ rõ xem từ đó là trang trọng, thân mật, chuyên ngành hay thông dụng.
-`
+*/
+
               });
 
               requestObj.messages.push({
@@ -265,27 +273,23 @@ ${request.selectionText}`
             requestObj.messages.push({
               role: "user",
               content: `Bạn sẽ đóng vai là một chuyên gia về ngôn ngữ, có hiểu biết sâu sắc văn hóa bản địa, đặc biệt là tiếng Anh và tiếng Việt, bạn sẽ giúp sửa lỗi tiếng Anh.
-              - Câu trả lời phải là định dạng markdown
-              - Đừng đưa ra những câu "introduce prompt words or opening remarks" trong câu trả lời. Hãy đi thẳng vào câu trả lời. Đừng lan man, dài dòng.
-              - Nếu không có yêu cầu đặc biệt, hãy trả lời bằng ngôn ngữ của câu hỏi mà bạn nhận được
-              - Khi sửa lỗi, câu trả lời của bạn nên có 2 phần:
-### Câu đúng
+- Câu trả lời phải là định dạng markdown
+- Đừng đưa ra những câu "introduce prompt words or opening remarks" trong câu trả lời. Hãy đi thẳng vào câu trả lời. Đừng lan man, dài dòng.
+- Nếu không có yêu cầu đặc biệt, hãy trả lời bằng ngôn ngữ của câu hỏi mà bạn nhận được
 - Từ hoặc câu văn sau khi đã sửa chính xác (ngôn ngữ của câu đã sửa là ngôn ngữ của câu được yêu cầu sửa), ví dụ, bạn được yêu cầu sửa 1 câu tiếng Anh, thì bạn phải trả lời lại 1 câu tiếng Anh đã sửa hoàn chỉnh.
 - markdown format, bôi đậm những chỗ đã sửa để highlight, phần giải thích nên được tổ chức tốt, dễ đọc, có outline...
-- Nếu câu văn không có lỗi gì, thì chỉ cần nói là không có lỗi, đừng cố bịa ra câu trả lời.
-- Tách bạch của đã sửa với những thông tin phụ để tăng tính nhận diện, hỗ trợ cho người học dễ hiểu hơn, trực quan hơn
+- Nếu câu văn không có lỗi gì, thì chỉ cần nói là không có lỗi, đừng cố bịa ra câu trả lời.`});
 
-### Thông tin bổ sung
-**Giải thích lỗi và sửa lỗi:**
-- Mô tả lỗi: Giải thích ngắn gọn lỗi mà người học đã mắc phải (ví dụ: sai ngữ pháp, sai chính tả, sử dụng từ không chính xác, v.v.).
-- Nguyên nhân phổ biến: Cung cấp thông tin về lý do tại sao lỗi này thường xảy ra và làm sao để tránh nó.
-- Cách sửa: Cung cấp giải pháp cụ thể để sửa lỗi.
-- Ví dụ đúng: Cung cấp ví dụ minh họa cách sử dụng đúng.
+// ### Thông tin bổ sung
+// **Giải thích lỗi và sửa lỗi:**
+// - Mô tả lỗi: Giải thích ngắn gọn lỗi mà người học đã mắc phải (ví dụ: sai ngữ pháp, sai chính tả, sử dụng từ không chính xác, v.v.).
+// - Nguyên nhân phổ biến: Cung cấp thông tin về lý do tại sao lỗi này thường xảy ra và làm sao để tránh nó.
+// - Cách sửa: Cung cấp giải pháp cụ thể để sửa lỗi.
+// - Ví dụ đúng: Cung cấp ví dụ minh họa cách sử dụng đúng.
 
-**Quy tắc ngữ pháp liên quan:**
-- Quy tắc ngữ pháp: Cung cấp quy tắc ngữ pháp liên quan đến lỗi để người học có thể nắm rõ hơn.
-- Ghi chú ngữ pháp: Giải thích chi tiết hơn về các quy tắc ngữ pháp phức tạp nếu cần.`
-            });
+// **Quy tắc ngữ pháp liên quan:**
+// - Quy tắc ngữ pháp: Cung cấp quy tắc ngữ pháp liên quan đến lỗi để người học có thể nắm rõ hơn.
+// - Ghi chú ngữ pháp: Giải thích chi tiết hơn về các quy tắc ngữ pháp phức tạp nếu cần.
 
             requestObj.messages.push({
               role: "user",
@@ -320,18 +324,20 @@ ${request.selectionText}`
             requestObj.messages.push({
               role: "system",
               content: `You are a knowledgeable and engaging teacher. 
-              Your goal is to educate the user about various topics they might be interested in. 
+              Your goal is to educate the user about various topics they might be interested in.
+              Make sure the content is well-organized and easy to read, with clear main headings and subheadings that provide detailed supplementary information to guide learners through each section, making it easy for them to follow along. 
               Provide clear explanations, examples, and answer any questions the user may have. 
-              Make sure to break down complex concepts into simpler terms and relate them to real-world applications when possible. 
+              Make sure to break down complex concepts into simpler terms and relate them to real-world applications when possible.               
               Be patient, encouraging, and responsive to the user's level of understanding. 
               Adapt your teaching style based on the user's feedback and engagement. 
               Always strive to make learning enjoyable and accessible.
+              IMPORTANT: Be honest, don't make things up.
               IMPORTANT: You must always answer in Vietnamese, unless otherwise is requested.`
             });
 
             requestObj.messages.push({
               role: "user",
-              content: `OK, please teach me this (always answer me in Vietnamese please):\n
+              content: `OK, please teach me this (always answer me in Vietnamese please from now):\n
 ${request.selectionText}`
             });
           }else{
@@ -507,25 +513,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
     //reset chat message
     setTabItems(tab.id, {
-      chatMessages: []
+      chatMessages: [],
+      lastSelectedCommand: info.menuItemId
     }, ()=>{
-      
+      // Send the message to the content script 
+      chrome.tabs.sendMessage(tab.id, { 
+        type: info.menuItemId, 
+        selectionText: info.selectionText,
+        isNewChat: true
+      }, (response) => { 
+        // Handle the response from background.js (via content.js)
+        // if (response.error) {
+        //   console.error(response.error);
+        //   alert("An error occurred: " + response.error); 
+        // } else {
+        //   alert(response.result);
+        // }
+      });
     });
 
-    // Send the message to the content script 
-    chrome.tabs.sendMessage(tab.id, { 
-      type: info.menuItemId, 
-      selectionText: info.selectionText,
-      isNewChat: true
-    }, (response) => { 
-      // Handle the response from background.js (via content.js)
-      // if (response.error) {
-      //   console.error(response.error);
-      //   alert("An error occurred: " + response.error); 
-      // } else {
-      //   alert(response.result);
-      // }
-    });
+    
 
     // clearTabStorage(tab.id);
 

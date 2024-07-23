@@ -1,5 +1,5 @@
-document.getElementById('toggle-password-1').addEventListener('click', function() {
-  var passwordInput = document.getElementById('api-key');
+document.getElementById('groq-api-key-toggle-password').addEventListener('click', function() {
+  var passwordInput = document.getElementById('groq-api-key');
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
   } else {
@@ -7,7 +7,16 @@ document.getElementById('toggle-password-1').addEventListener('click', function(
   }
 });
 
-document.getElementById('toggle-password-2').addEventListener('click', function() {
+document.getElementById('openai-api-key-toggle-password').addEventListener('click', function() {
+  var passwordInput = document.getElementById('openai-api-key');
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+  } else {
+    passwordInput.type = 'password';
+  }
+});
+
+document.getElementById('openai-whisper-toggle-password').addEventListener('click', function() {
   var passwordInput = document.getElementById('openai-tts-api-key');
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
@@ -17,22 +26,39 @@ document.getElementById('toggle-password-2').addEventListener('click', function(
 });
 
 document.getElementById('save-settings').addEventListener('click', () => {
-  const apiUrl = document.getElementById('api-url').value;
-  const apiKey = document.getElementById('api-key').value;
-  const modelName = document.getElementById('model-name').value;
-  const temperature = parseFloat(document.getElementById('temperature').value); // Convert to number
-  const maxToken = parseInt(document.getElementById('max-token').value);
+  const completionProvider =  document.getElementById('completion-provider').value;
+
+  const groqApiUrl = document.getElementById('groq-api-url').value;
+  const groqApiKey = document.getElementById('groq-api-key').value;
+  const groqModelName = document.getElementById('groq-model-name').value;
+  const groqTemperature = parseFloat(document.getElementById('groq-temperature').value); // Convert to number
+  const groqMaxToken = parseInt(document.getElementById('groq-max-token').value);
+
+  const openAiApiUrl = document.getElementById('openai-api-url').value;
+  const openAiApiKey = document.getElementById('openai-api-key').value;
+  const openAiModelName = document.getElementById('openai-model-name').value;
+  const openAiTemperature = parseFloat(document.getElementById('openai-temperature').value); // Convert to number
+  const openAiMaxToken = parseInt(document.getElementById('openai-max-token').value);
 
   const openAITTSApiKey = document.getElementById('openai-tts-api-key').value;
   const openAITTSModelName = document.getElementById('openai-tts-model-name').value;
   const openAITTSVoice = document.getElementById('openai-tts-voice').value;
 
-  chrome.storage.sync.set({ 
-    apiUrl: apiUrl, 
-    apiKey: apiKey,
-    modelName: modelName, 
-    temperature: temperature,
-    maxToken: maxToken,
+  chrome.storage.sync.set({
+    completionProvider: completionProvider,
+
+    groqApiUrl: groqApiUrl, 
+    groqApiKey: groqApiKey,
+    groqModelName: groqModelName, 
+    groqTemperature: groqTemperature,
+    groqMaxToken: groqMaxToken,
+
+    openAiApiUrl: openAiApiUrl, 
+    openAiApiKey: openAiApiKey,
+    openAiModelName: openAiModelName, 
+    openAiTemperature: openAiTemperature,
+    openAiMaxToken: openAiMaxToken,
+
     openAITTSApiKey: openAITTSApiKey,
     openAITTSModelName: openAITTSModelName,
     openAITTSVoice: openAITTSVoice,
@@ -43,12 +69,25 @@ document.getElementById('save-settings').addEventListener('click', () => {
 });
 
 // Load saved settings on page load
-chrome.storage.sync.get(['apiUrl', 'apiKey', 'modelName', 'temperature', 'maxToken', 'openAITTSApiKey', 'openAITTSModelName', 'openAITTSVoice'], (items) => {
-  document.getElementById('api-url').value = items.apiUrl || '';
-  document.getElementById('api-key').value = items.apiKey || '';
-  document.getElementById('model-name').value = items.modelName || '';
-  document.getElementById('temperature').value = items.temperature;
-  document.getElementById('max-token').value = items.maxToken;
+chrome.storage.sync.get([
+  'completionProvider',
+  'groqApiUrl', 'groqApiKey', 'groqModelName', 'groqTemperature', 'groqMaxToken', 
+  'openAiApiUrl', 'openAiApiKey', 'openAiModelName', 'openAiTemperature', 'openAiMaxToken', 
+  'openAITTSApiKey', 'openAITTSModelName', 'openAITTSVoice'
+], (items) => {
+  document.getElementById('completion-provider').value = items.completionProvider || 'groq';
+
+  document.getElementById('groq-api-url').value = items.groqApiUrl || '';
+  document.getElementById('groq-api-key').value = items.groqApiKey || '';
+  document.getElementById('groq-model-name').value = items.groqModelName || '';
+  document.getElementById('groq-temperature').value = items.groqTemperature;
+  document.getElementById('groq-max-token').value = items.groqMaxToken;
+
+  document.getElementById('openai-api-url').value = items.openAiApiUrl || '';
+  document.getElementById('openai-api-key').value = items.openAiApiKey || '';
+  document.getElementById('openai-model-name').value = items.openAiModelName || '';
+  document.getElementById('openai-temperature').value = items.openAiTemperature;
+  document.getElementById('openai-max-token').value = items.openAiMaxToken;
 
   document.getElementById('openai-tts-api-key').value = items.openAITTSApiKey || '';
   document.getElementById('openai-tts-model-name').value = items.openAITTSModelName || '';

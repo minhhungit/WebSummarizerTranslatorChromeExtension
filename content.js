@@ -99,8 +99,13 @@ const playAudio = (audioUrl) => {
       document.body.appendChild(modal);
     }
 
-    if (request.isNewChat){
+    chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['lastSelectedCommand', 'chatMessages'] }, (storageResponse) => {
+      const lastSelectedCommand = storageResponse.lastSelectedCommand;
+      modal.shadowRoot.querySelector('.title-sub').innerText = `[${lastSelectedCommand}]`;
+    })
 
+    if (request.isNewChat){
+      clearAllMessagesHtml();
     }
 
     // Show the modal
@@ -299,6 +304,11 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
     document.body.appendChild(modal);
   }
 
+  chrome.runtime.sendMessage({ type: 'getTabItems', itemNames: ['lastSelectedCommand', 'chatMessages'] }, (storageResponse) => {
+    const lastSelectedCommand = storageResponse.lastSelectedCommand;
+    modal.shadowRoot.querySelector('.title-sub').innerText = `[${lastSelectedCommand}]`;
+  })
+
   // Convert Markdown to HTML
   //const converter = new showdown.Converter(); 
   // var converter = new showdown.Converter({extensions: ['table', 'youtube', 'prettify']});
@@ -484,8 +494,14 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
 
     if (actionEditButton.innerText == "Edit"){
       
+      selectedMessageElm.classList.add("edit-chat-message");
+
        // Create a new input textbox element
       let inputTextbox = document.createElement('textarea');
+      inputTextbox.addEventListener("keydown", function (event) {
+        event.stopPropagation();
+      });
+
       inputTextbox.placeholder = "Type your message here...";
       inputTextbox.rows = 4;
       inputTextbox.style.width = '100%';
@@ -510,6 +526,7 @@ function addMessageIntoModal(request, role, rawMessage, hideDefaultMessage, isEr
       }      
     }
     else{
+      selectedMessageElm.classList.remove("edit-chat-message");
       marked.setOptions({
           breaks: true // Enable GFM line breaks
       });
@@ -981,6 +998,10 @@ function createModal(request) {
       font-family: monospace;
       font-size: 14px;
     }
+
+    .chat-message.edit-chat-message{
+      width: 70% !important;
+    }
   
     .message-actions {
       position: absolute;
@@ -1055,6 +1076,11 @@ function createModal(request) {
       margin: 0;
     }
   
+    .dialog-head .title .title-sub{
+      font-size: 0.7em;
+      color: #35dbba;
+    }
+
     .dialog-footer{
       height: 10px;
       background-color: #eee;
@@ -1116,7 +1142,7 @@ function createModal(request) {
     </style>
     <div class="modal-container">
       <div class="dialog-head">
-        <h3 class="title">AI Chatbot</h3>
+        <h3 class="title">AI Chatbot <span class="title-sub"></span></h3>
         <div class="caption-bar-actions">
           <button class="caption-bar-action-button print-chat-button" title="Print">🖶 Print</button>
           <button class="caption-bar-action-button minimize-dialog-button" title="Minimize">⇘</button>
@@ -1124,6 +1150,11 @@ function createModal(request) {
         </div>
       </div>
       <div class="chat-messages"></div>
+      <div class="parameters" style="display: none">
+        <div>
+          <label for="chat-temperature">Temperature (0.0 - 2.0):</label> <input type="number" id="chat-temperature" min="0" max="2" step="0.1">
+        </div>
+      </div>
       <div class="chat-input-container">
         <textarea class="chat-input" rows="4" placeholder="Type your message here..."></textarea>
         <button class="send-button">Send</button>
@@ -1132,6 +1163,26 @@ function createModal(request) {
     </div>
     <button class="maximize-dialog-button hide">AI Chatbot</button>
   `;
+
+  //console.log(modal.shadowRoot.querySelector('.title-sub'));
+
+  // chrome.storage.sync.get([
+  //   'completionProvider',
+  //   'groqTemperature',
+  //   'openAiTemperature',
+  //   'lastSelectedCommand'
+  // ], (items) => {
+  //   //const completionProvider = items.completionProvider || 'groq';
+  //   //const temperature = completionProvider == "groq" ? (items.groqTemperature || 0) : (items.openAiTemperature || 0);
+    
+
+  //   modal.shadowRoot.querySelector('.title-sub').innerText = `[${lastSelectedCommand}]`;
+  //   //modal.shadowRoot.querySelector('#chat-temperature').innerText = `[${temperature}]`;
+
+  //   //chrome.runtime.sendMessage({ type: 'setTabItems', itemNames: {chatTemperature: temperature, chatProvider: completionProvider} }, (res) => {});    
+  // });
+  
+
 
   // Function to load html2canvas script
 
@@ -1193,7 +1244,7 @@ function createModal(request) {
       maximizeButton.classList.remove('hide');
   });
   
-  shadow.querySelector('.print-chat-button').addEventListener('click', () => {
+  shadow.querySelector('.print-chat-button').addEventListener('click', (e) => {
     printChat(shadow.querySelector('.chat-messages'));
 
     //loadHtml2Canvas();
@@ -1319,9 +1370,11 @@ function makeDraggable(elmnt, headElmt) {
     elmnt.onmousedown = dragMouseDown;
   }
 
-  function dragMouseDown(e) {
+  function dragMouseDown(e) {    
     e = e || window.event;
     e.preventDefault();
+    e.stopPropagation();
+
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
@@ -1333,6 +1386,8 @@ function makeDraggable(elmnt, headElmt) {
   function elementDrag(e) {
     e = e || window.event;
     e.preventDefault();
+    e.stopPropagation();
+
     // calculate the new cursor position:
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;

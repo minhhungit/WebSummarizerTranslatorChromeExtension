@@ -69,41 +69,82 @@
   <h2>Settings</h2>
   <div class="container">
     <div class="input-group">
-      <label for="api-url">API URL:</label>
-      <input type="text" id="api-url" value="" placeholder="https://api.groq.com/openai/v1/chat/completions">
+      <label for="completion-provider">Completion API Provider:</label>
+      <select id="completion-provider">
+        <option value="groq">Groq</option>
+        <option value="openai">OpenAI</option>
+      </select>
+    </div>
+    <div style="text-align: center; width: 300px; margin: 0 auto; margin-top:20px; margin-bottom: 20px">
+      -----------USING GROQ API-------------
+    </div>
+    <div class="input-group">
+      <label for="groq-api-url">API URL:</label>
+      <input type="text" id="groq-api-url" value="" placeholder="https://api.groq.com/openai/v1/chat/completions">
     </div>
 
     <div class="input-group">
-      <label for="api-key">API Key:</label>
-      <input type="password" id="api-key" class="is-pass" value="" placeholder="Your API Key, gsk_...">
-      <span id="toggle-password-1" class="toggle-password">👀</span>
+      <label for="groq-api-key">API Key:</label>
+      <input type="password" id="groq-api-key" class="is-pass" value="" placeholder="Your API Key, gsk_...">
+      <span id="groq-api-key-toggle-password" class="toggle-password">👀</span>
     </div>
 
     <div class="input-group">
-      <label for="model-name">Model Name:</label>
-      <input type="text" id="model-name" value="" placeholder="e.g., llama3-70b-8192">
+      <label for="groq-model-name">Model Name:</label>
+      <input type="text" id="groq-model-name" value="" placeholder="e.g., llama3-70b-8192">
     </div>
 
     <div class="input-group">
-      <label for="temperature">Temperature (0.0 - 2.0):</label>
-      <input type="number" id="temperature" min="0" max="2" step="0.1">
+      <label for="groq-temperature">Temperature (0.0 - 2.0):</label>
+      <input type="number" id="groq-temperature" min="0" max="2" step="0.1">
     </div>
 
     <div class="input-group">
-      <label for="max-token">Max Token (4096 for gpt3.5 or 8192 for llama 3):</label>
-      <input type="number" id="max-token" min="0">
+      <label for="groq-max-token">Max Token (4096 for gpt3.5 or 8192 for llama 3):</label>
+      <input type="number" id="groq-max-token" min="0">
+    </div>
+
+    <div style="text-align: center; width: 300px; margin: 0 auto; margin-top:20px; margin-bottom: 20px">
+      ------------USING OPENAI API------------
+    </div>
+
+    <div class="input-group">
+      <label for="openai-api-url">API URL:</label>
+      <input type="text" id="openai-api-url" value="" placeholder="https://api.openai.com/v1/chat/completions">
+    </div>
+
+    <div class="input-group">
+      <label for="openai-api-key">API Key:</label>
+      <input type="password" id="openai-api-key" class="is-pass" value="" placeholder="Your API Key, gsk_...">
+      <span id="openai-api-key-toggle-password" class="toggle-password">👀</span>
+    </div>
+
+    <div class="input-group">
+      <label for="openai-model-name">Model Name:</label>
+      <input type="text" id="openai-model-name" value="" placeholder="e.g., gpt-3.5-turbo-0125, gpt-4o-mini">
+    </div>
+
+    <div class="input-group">
+      <label for="openai-temperature">Temperature (0.0 - 2.0):</label>
+      <input type="number" id="openai-temperature" min="0" max="2" step="0.1">
+    </div>
+
+    <div class="input-group">
+      <label for="openai-max-token">Max Token (4096 for gpt3.5 or 8192 for llama 3, 16384 for gpt-4o-mini):</label>
+      <input type="number" id="openai-max-token" min="0">
     </div>
 
     <div style="text-align: center; width: 300px; margin: 0 auto; margin-top:20px; margin-bottom: 20px">
       ------------------------
     </div>
 
+
     <h3>OPEN AI Whisper (Optional)</h3>
 
     <div class="input-group">
       <label for="openai-tts-api-key">OPEN AI - API Key:</label>
       <input type="password" id="openai-tts-api-key" class="is-pass" value="" placeholder="OPEN AI API Key">
-      <span id="toggle-password-2" class="toggle-password">👀</span>
+      <span id="openai-whisper-toggle-password" class="toggle-password">👀</span>
     </div>
 
     <div class="input-group">
